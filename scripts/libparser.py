@@ -98,6 +98,7 @@ def _comp(args):
 
 
 def _text(args):
+    Argc("text", args, 0)
     return True
 
 
@@ -206,7 +207,9 @@ def Parse() -> str:
     try:
         ScopeValidate()
     except ValueError as e:
-        raise ValueError(f"line {n if text else 1}: {e}") from e
+        raise ValueError(
+            f"line {n if text else 1}: {e}"
+        ) from e
 
     return "".join(result)
 
@@ -238,8 +241,11 @@ def main():
 
     parser = argparse.ArgumentParser()
     group = parser.add_mutually_exclusive_group()
+
     group.add_argument("-s", action="append", default=[])
     group.add_argument("-c", nargs="?", action="append", const="")
+    group.add_argument("-u", action="store_true")
+
     args = parser.parse_args()
 
     check = -1
@@ -261,13 +267,19 @@ def main():
         text = sys.stdin.buffer.read().decode("utf-8")
         parseStr = Parse()
 
-        if args.c is not None:
+        if args.u:
+            if reference_url is None:
+                raise ValueError("@url is not defined")
+            print(reference_url)
+
+        elif args.c is not None:
             if check == -1:
                 print(len(checks))
             else:
                 if check > len(checks):
                     raise ValueError("@check index out of range")
                 Rerun(*checks[check - 1])
+
         else:
             sys.stdout.buffer.write(parseStr.encode("utf-8"))
 
