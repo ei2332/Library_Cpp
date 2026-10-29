@@ -12,7 +12,7 @@
 
 ## Pull Request
 
-原則として、Pull Requestは受け付けていません。
+原則として、Pull Requestは受け付けていません。(AIが利用するため)
 
 コードの修正や機能追加をご希望の場合は、Pull RequestではなくIssueを作成し、変更内容をご提案ください。
 
