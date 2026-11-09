@@ -1,6 +1,6 @@
 //// @url https://github.com/ei2332/Library_Cpp/blob/main/src/WeightedUnionFind.cpp
 //// @name WeightedUnionFind
-//// @check https://onlinejudge.u-aizu.ac.jp/courses/library/3/DSL/all/DSL_1_B include check
+//// @check https://judge.yosupo.jp/problem/unionfind_with_potential include check
 //// ! include
 #include <bits/stdc++.h>
 using namespace std;
@@ -38,16 +38,26 @@ signed main() {
     int n, q;
     cin >> n >> q;
     WeightedUnionFind uf(n);
+    constexpr int MOD = 998244353;
+    auto norm = [&](int x) -> int {
+        x %= MOD;
+        if (x < 0) x += MOD;
+        return x;
+    };
     while (q--) {
-        int c, x, y;
-        cin >> c >> x >> y;
-        if (c == 0) {
+        int t, u, v;
+        cin >> t >> u >> v;
+        if (t == 0) {
             int w;
             cin >> w;
-            uf.unite(x, y, w);
+            if (uf.root(u) == uf.root(v)) {
+                int diff = uf.d[u] - uf.d[v];
+                w = diff + norm(w - diff);
+            }
+            cout << (uf.unite(v, u, w) != -2) << '\n';
         } else {
-            if (uf.root(x) != uf.root(y)) cout << "?\n";
-            else cout << uf.d[y] - uf.d[x] << "\n";
+            if (uf.root(u) != uf.root(v)) cout << -1 << '\n';
+            else cout << norm(uf.d[u] - uf.d[v]) << '\n';
         }
     }
 }
