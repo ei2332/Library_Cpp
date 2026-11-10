@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 """Verify published source URLs and all libparser @check cases."""
 
+import os
 import subprocess
 import sys
 import tempfile
@@ -82,11 +83,37 @@ def verify_file(path: Path) -> None:
             print(f"[OK] {relative}: @check #{index}", flush=True)
 
 
+def select_paths(paths: list[Path]) -> list[Path]:
+    base = os.environ.get("VERIFY_BASE_SHA", "")
+    if not base or base == "0" * 40:
+        print("[INFO] No comparison commit; verifying all sources.", flush=True)
+        return paths
+
+    diff = subprocess.run(
+        ["git", "diff", "--name-only", "--diff-filter=ACMRD", "-z", base, "HEAD"],
+        cwd=ROOT,
+        capture_output=True,
+        check=True,
+    )
+    changed = set(filter(None, diff.stdout.decode("utf-8").split(chr(0))))
+    if any(name.startswith("scripts/") or name.startswith(".github/workflows/") for name in changed):
+        print("[INFO] Verification infrastructure changed; verifying all sources.", flush=True)
+        return paths
+
+    selected = [path for path in paths if path.relative_to(ROOT).as_posix() in changed]
+    print(f"[INFO] Changed sources: {len(selected)} of {len(paths)}.", flush=True)
+    return selected
+
+
 def main() -> int:
     paths = sorted(path for path in SOURCES.rglob("*") if path.is_file() and path.suffix in {".cpp", ".hpp", ".h", ".cc", ".cxx"})
     if not paths:
         print(f"[FAIL] no source files under {SOURCES}", file=sys.stderr)
         return 1
+    paths = select_paths(paths)
+    if not paths:
+        print("[SKIP] No source files to verify.", flush=True)
+        return 0
     failed = 0
     for path in paths:
         try:
