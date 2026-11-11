@@ -67,11 +67,12 @@ def verify_file(path: Path) -> None:
                 check=True,
                 timeout=120,
             )
-            download = ["oj", "download", "-d", str(tests)]
-            if parts.hostname == "judge.yosupo.jp":
+            download = ["oj", "download", "--silent", "-d", str(tests)]
+            system = parts.hostname == "judge.yosupo.jp"
+            if system:
                 download.append("--system")
             download.append(url)
-            subprocess.run(download, check=True, timeout=120)
+            subprocess.run(download, check=True, timeout=600 if system else 120)
             inputs = list(tests.rglob("*.in"))
             if not inputs or any(not p.with_suffix(".out").is_file() for p in inputs):
                 raise ValueError(f"@check #{index}: no complete test cases downloaded")
