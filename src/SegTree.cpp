@@ -1,5 +1,6 @@
 //// @url https://github.com/ei2332/Library_Cpp/blob/main/src/SegTree.cpp
 //// @name SegTree
+//// @expl モノイドによる区間集約と点更新を行うセグメント木。lazyスコープでは区間更新にも対応する。
 //// @check https://judge.yosupo.jp/problem/point_add_range_sum include check_sum
 //// @check https://atcoder.jp/contests/abc340/tasks/abc340_e include lazy check_mancala
 //// @check https://judge.yosupo.jp/problem/range_affine_range_sum include lazy check_affine
@@ -25,12 +26,20 @@ struct Mint {
 //// end
 template <class T = int>
 struct SegTree {
+    //// expl f1: モノイドの二項演算
     T f1(T x, T y) { return x + y; }
+    //// expl e: f1の単位元
     T e = 0;
     //// ! lazy
     using S = pair<T, T>;
+    //// expl f2: 区間集約値に作用を適用する関数
+    //// text f2(f1(x,y),f,n+m) = f1(f2(x,f,n),f2(y,f,m))
+    //// text f2(x,le,len) = x
     T f2(T x, S f, int len) { return f.first * x + f.second * len; }
+    //// expl f3: モノイドの二項演算（古い作用oの後に新しい作用nを適用）
+    //// text f2(f2(x,o,len),n,len) = f2(x,f3(o,n),len)
     S f3(S o, S n) { return {o.first * n.first, n.first * o.second + n.second}; }
+    //// expl le: f3の単位元
     S le = {1, 0};
     //// end
 
@@ -39,6 +48,7 @@ struct SegTree {
     vector<S> lz;
     int sz = 1, log = 0;
 
+    //// comp O(n)
     SegTree(int n) {
         while (sz < n) sz *= 2, log++;
         d.assign(2 * sz, e);
@@ -46,6 +56,8 @@ struct SegTree {
         lz.assign(sz, le);
     }
     //// ! lazy
+    //// expl ノードkに蓄積された作用を左右の子へ伝搬する
+    //// comp O(1)
     void push(int k, int len) {
         if (lz[k] == le) return;
         int l = k * 2, r = l + 1;
@@ -58,6 +70,8 @@ struct SegTree {
         lz[k] = le;
     }
     //// end
+    //// expl i番目の要素をxに変更する
+    //// comp O(log n)
     void set(int i, T x) {
         int k = i + sz;
         //// !! lazy
@@ -65,6 +79,8 @@ struct SegTree {
         d[k] = x;
         while (k >>= 1) d[k] = f1(d[k * 2], d[k * 2 + 1]);
     }
+    //// expl 半開区間[l,r)の集約値を返す
+    //// comp O(log n)
     T query(int l, int r, int k = 1, int a = 0, int b = -1) {
         if (b < 0) b = sz;
         if (r <= a || b <= l) return e;
@@ -75,6 +91,8 @@ struct SegTree {
         return f1(query(l, r, k * 2, a, m), query(l, r, k * 2 + 1, m, b));
     }
     //// ! lazy
+    //// expl 半開区間[l,r)に作用fを適用する
+    //// comp O(log n)
     void apply(int l, int r, S f, int k = 1, int a = 0, int b = -1) {
         if (b < 0) b = sz;
         if (r <= a || b <= l) return;
@@ -90,6 +108,8 @@ struct SegTree {
         d[k] = f1(d[k * 2], d[k * 2 + 1]);
     }
     //// end
+    //// expl i番目の要素を返す
+    //// comp O(log n)
     T get(int i) { return query(i, i + 1); }
 };
 //// ! check_sum
