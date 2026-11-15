@@ -3,12 +3,13 @@
 //// @expl PBDSによる順序統計付き集合。Imapは値を持つ順序統計付き連想配列。
 //// @check https://judge.yosupo.jp/problem/ordered_set include check_set
 //// @check https://judge.yosupo.jp/problem/associative_array include check_map
-//// ! include
-#include <bits/stdc++.h>
+//// text 以下のPBDS用ヘッダーとusing宣言は #define int long long より前に置く
 #include <ext/pb_ds/assoc_container.hpp>
 #include <ext/pb_ds/tree_policy.hpp>
-using namespace std;
 using namespace __gnu_pbds;
+//// ! include
+#include <bits/stdc++.h>
+using namespace std;
 #define int long long
 
 #ifndef DEBUG_OUT
