@@ -17,6 +17,7 @@ using namespace std;
 #endif
 //// end
 template <typename T, typename S = null_type>
+//// text less<T>をless_equal<T>にするとmultiset,multimapになる
 struct Iset : tree<T, S, less<T>, rb_tree_tag, tree_order_statistics_node_update> {
     using base = tree<T, S, less<T>, rb_tree_tag, tree_order_statistics_node_update>;
     using base::base;
