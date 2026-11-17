@@ -1,7 +1,7 @@
 //// @url https://github.com/ei2332/Library_Cpp/blob/main/src/SCC.cpp
 //// @name SCC
 //// @expl 強連結成分分解（Kosaraju法）
-//// @check https://judge.yosupo.jp/problem/scc include check
+//// @checked https://judge.yosupo.jp/problem/scc include check
 //// ! include
 #include <bits/stdc++.h>
 using namespace std;
