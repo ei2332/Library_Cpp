@@ -1,6 +1,6 @@
 //// @url https://github.com/ei2332/Library_Cpp/blob/main/src/prime.cpp
 //// @name Prime
-//// @expl SPF、64bit素数判定（Miller-Rabin法）、素因数分解（Pollard's Rho法）
+//// @expl SPF、64bit素数判定（Miller-Rabin法）、素因数分解（Pollard Rho法）
 //// @check https://judge.yosupo.jp/problem/primality_test include check_primality
 //// @check https://judge.yosupo.jp/problem/primality_test no_macro check_primality
 //// @check https://judge.yosupo.jp/problem/factorize no_macro check_factorize
