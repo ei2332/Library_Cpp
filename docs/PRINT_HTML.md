@@ -24,3 +24,18 @@ python -m unittest discover -s tests -p 'test_print_html.py'
 ```
 
 色に依存しないよう、網掛けの左端には斜線も描画しています。
+
+## CIでのHTML生成
+
+GitHub Actionsの `build_html` ジョブが `verify` ジョブと並列に実行されます。
+`scripts/build_site.py` は `src/` の全ライブラリを既存の `libparser.py` で解析し、
+`dist/index.html` と `dist/lib/*.html` を生成します。
+成果物は Actions Artifact `library-print-html` として保存されます。
+通常の `verify` ジョブの成功に依存せず、HTML生成の成否も独立にCIに反映されます。
+
+```sh
+python scripts/build_site.py --output dist
+```
+
+一覧ページは `@name` と `@expl` のみを用い、カテゴリーや機能の意味を推測しません。
+印刷用HTMLには `include` スコープの内容が入りません。
