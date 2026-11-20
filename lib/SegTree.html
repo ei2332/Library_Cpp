@@ -1,0 +1,137 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>SegTree</title>
+<style>
+:root {
+    color-scheme: light;
+    --ink: #20242a;
+    --muted: #737a85;
+    --rule: #d6dce4;
+    --blue: #25517c;
+    --note-bg: #edf3fa;
+    --complexity-bg: #e9ecf2;
+    --shade-bg: #fff8e3;
+    --shade-line: #a07a2f;
+}
+* { box-sizing: border-box; }
+body { margin: 0; background: #fff; color: var(--ink); font-family: system-ui, -apple-system, 'Yu Gothic', Meiryo, sans-serif; }
+main { max-width: 900px; margin: 0 auto; padding: 28px 25px 52px; }
+header { border-bottom: 1px solid var(--rule); padding: 0 0 13px; margin-bottom: 17px; }
+h1 { margin: 0 0 6px; font-size: 24px; letter-spacing: .01em; }
+.summary { font-size: 13px; line-height: 1.6; margin: 0; }
+.code-row { position: relative; display: grid; grid-template-columns: 39px minmax(0, 1fr); min-height: 19px; line-height: 19px; font: 12px/19px Consolas, 'Liberation Mono', 'Noto Sans Mono CJK JP', monospace; }
+.num { color: #8a929d; text-align: right; padding-right: 13px; user-select: none; border-right: 1px solid var(--rule); }
+.code-row code { white-space: pre; padding-left: 13px; display: block; overflow: visible; font: inherit; }
+.note { font-size: 12px; line-height: 1.55; padding: 5px 10px; margin: 6px 0 4px; break-inside: avoid; }
+.note.expl { border-left: 3px solid var(--blue); background: var(--note-bg); font-weight: 600; }
+.note.comp { background: var(--complexity-bg); color: #343f4f; border-left: 3px solid #aab3c0; }
+.note.text { border-left: 2px solid #9ba6b7; color: #4f5b6b; }
+.code-row.shaded { background: var(--shade-bg); }
+.code-row.shaded::before, .note.shaded::before {
+    content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 8px;
+    border-left: 1px solid var(--shade-line);
+    background: repeating-linear-gradient(135deg, #b29a60 0 1px, transparent 1px 4px);
+}
+.note.shaded { position: relative; background: var(--shade-bg); border-left: 0; padding-left: 14px; }
+.kw { color: #244f86; font-weight: 600; }
+.literal { color: #86521d; }
+.str { color: #24604d; }
+.comment { color: #678069; }
+@page { size: A4 portrait; margin: 13mm 12mm; }
+@media print {
+    html, body { width: auto; background: white; }
+    main { padding: 0; max-width: none; }
+    h1 { font-size: 19pt; }
+    .code-row { font-size: 9px; line-height: 14px; min-height: 14px; break-inside: avoid; }
+    .note { font-size: 10px; }
+    header { break-after: avoid; }
+    .code-row, .note { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+}
+</style>
+</head>
+<body><main><article>
+<header>
+<h1>SegTree</h1>
+<p class="summary">モノイドによる区間集約と点更新を行うセグメント木。lazyスコープでは区間更新にも対応する。</p>
+</header>
+<div class="code-row"><span class="num">1</span><code><span class="kw">template</span> &lt;<span class="kw">class</span> T = <span class="kw">int</span>&gt;</code></div>
+<div class="code-row"><span class="num">2</span><code><span class="kw">struct</span> SegTree {</code></div>
+<div class="note expl">f1: モノイドの二項演算</div>
+<div class="code-row"><span class="num">3</span><code>    T f1(T x, T y) { <span class="kw">return</span> x + y; }</code></div>
+<div class="note expl">e: f1の単位元</div>
+<div class="code-row"><span class="num">4</span><code>    T e = <span class="literal">0</span>;</code></div>
+<div class="code-row shaded"><span class="num">5</span><code>    <span class="kw">using</span> S = pair&lt;T, T&gt;;</code></div>
+<div class="note expl shaded">f2: 区間集約値に作用を適用する関数</div>
+<div class="note text shaded">f2(f1(x,y),f,n+m) = f1(f2(x,f,n),f2(y,f,m))</div>
+<div class="note text shaded">f2(x,le,len) = x</div>
+<div class="code-row shaded"><span class="num">6</span><code>    T f2(T x, S f, <span class="kw">int</span> len) { <span class="kw">return</span> f.first * x + f.second * len; }</code></div>
+<div class="note expl shaded">f3: モノイドの二項演算（古い作用oの後に新しい作用nを適用）</div>
+<div class="note text shaded">f2(f2(x,o,len),n,len) = f2(x,f3(o,n),len)</div>
+<div class="code-row shaded"><span class="num">7</span><code>    S f3(S o, S n) { <span class="kw">return</span> {o.first * n.first, n.first * o.second + n.second}; }</code></div>
+<div class="note expl shaded">le: f3の単位元</div>
+<div class="code-row shaded"><span class="num">8</span><code>    S le = {<span class="literal">1</span>, <span class="literal">0</span>};</code></div>
+<div class="code-row"><span class="num">9</span><code></code></div>
+<div class="code-row"><span class="num">10</span><code>    vector&lt;T&gt; d;</code></div>
+<div class="code-row shaded"><span class="num">11</span><code>    vector&lt;S&gt; lz;</code></div>
+<div class="code-row"><span class="num">12</span><code>    <span class="kw">int</span> sz = <span class="literal">1</span>, log = <span class="literal">0</span>;</code></div>
+<div class="note comp">計算量 O(n)</div>
+<div class="code-row"><span class="num">13</span><code>    SegTree(<span class="kw">int</span> n) {</code></div>
+<div class="code-row"><span class="num">14</span><code>        <span class="kw">while</span> (sz &lt; n) sz *= <span class="literal">2</span>, log++;</code></div>
+<div class="code-row"><span class="num">15</span><code>        d.assign(<span class="literal">2</span> * sz, e);</code></div>
+<div class="code-row shaded"><span class="num">16</span><code>        lz.assign(sz, le);</code></div>
+<div class="code-row"><span class="num">17</span><code>    }</code></div>
+<div class="note expl shaded">ノードkに蓄積された作用を左右の子へ伝搬する</div>
+<div class="note comp shaded">計算量 O(1)</div>
+<div class="code-row shaded"><span class="num">18</span><code>    <span class="kw">void</span> push(<span class="kw">int</span> k, <span class="kw">int</span> len) {</code></div>
+<div class="code-row shaded"><span class="num">19</span><code>        <span class="kw">if</span> (lz[k] == le) <span class="kw">return</span>;</code></div>
+<div class="code-row shaded"><span class="num">20</span><code>        <span class="kw">int</span> l = k * <span class="literal">2</span>, r = l + <span class="literal">1</span>;</code></div>
+<div class="code-row shaded"><span class="num">21</span><code>        d[l] = f2(d[l], lz[k], len / <span class="literal">2</span>);</code></div>
+<div class="code-row shaded"><span class="num">22</span><code>        d[r] = f2(d[r], lz[k], len / <span class="literal">2</span>);</code></div>
+<div class="code-row shaded"><span class="num">23</span><code>        <span class="kw">if</span> (l &lt; sz) {</code></div>
+<div class="code-row shaded"><span class="num">24</span><code>            lz[l] = f3(lz[l], lz[k]);</code></div>
+<div class="code-row shaded"><span class="num">25</span><code>            lz[r] = f3(lz[r], lz[k]);</code></div>
+<div class="code-row shaded"><span class="num">26</span><code>        }</code></div>
+<div class="code-row shaded"><span class="num">27</span><code>        lz[k] = le;</code></div>
+<div class="code-row shaded"><span class="num">28</span><code>    }</code></div>
+<div class="note expl">i番目の要素をxに変更する</div>
+<div class="note comp">計算量 O(log n)</div>
+<div class="code-row"><span class="num">29</span><code>    <span class="kw">void</span> set(<span class="kw">int</span> i, T x) {</code></div>
+<div class="code-row"><span class="num">30</span><code>        <span class="kw">int</span> k = i + sz;</code></div>
+<div class="code-row shaded"><span class="num">31</span><code>        <span class="kw">for</span> (<span class="kw">int</span> h = log; h &gt; <span class="literal">0</span>; h--) push(k &gt;&gt; h, <span class="literal">1LL</span> &lt;&lt; h);</code></div>
+<div class="code-row"><span class="num">32</span><code>        d[k] = x;</code></div>
+<div class="code-row"><span class="num">33</span><code>        <span class="kw">while</span> (k &gt;&gt;= <span class="literal">1</span>) d[k] = f1(d[k * <span class="literal">2</span>], d[k * <span class="literal">2</span> + <span class="literal">1</span>]);</code></div>
+<div class="code-row"><span class="num">34</span><code>    }</code></div>
+<div class="note expl">半開区間[l,r)の集約値を返す</div>
+<div class="note comp">計算量 O(log n)</div>
+<div class="code-row"><span class="num">35</span><code>    T query(<span class="kw">int</span> l, <span class="kw">int</span> r, <span class="kw">int</span> k = <span class="literal">1</span>, <span class="kw">int</span> a = <span class="literal">0</span>, <span class="kw">int</span> b = -<span class="literal">1</span>) {</code></div>
+<div class="code-row"><span class="num">36</span><code>        <span class="kw">if</span> (b &lt; <span class="literal">0</span>) b = sz;</code></div>
+<div class="code-row"><span class="num">37</span><code>        <span class="kw">if</span> (r &lt;= a || b &lt;= l) <span class="kw">return</span> e;</code></div>
+<div class="code-row"><span class="num">38</span><code>        <span class="kw">if</span> (l &lt;= a &amp;&amp; b &lt;= r) <span class="kw">return</span> d[k];</code></div>
+<div class="code-row shaded"><span class="num">39</span><code>        push(k, b - a);</code></div>
+<div class="code-row"><span class="num">40</span><code>        <span class="kw">int</span> m = (a + b) / <span class="literal">2</span>;</code></div>
+<div class="code-row"><span class="num">41</span><code>        <span class="kw">return</span> f1(query(l, r, k * <span class="literal">2</span>, a, m), query(l, r, k * <span class="literal">2</span> + <span class="literal">1</span>, m, b));</code></div>
+<div class="code-row"><span class="num">42</span><code>    }</code></div>
+<div class="note expl shaded">半開区間[l,r)に作用fを適用する</div>
+<div class="note comp shaded">計算量 O(log n)</div>
+<div class="code-row shaded"><span class="num">43</span><code>    <span class="kw">void</span> apply(<span class="kw">int</span> l, <span class="kw">int</span> r, S f, <span class="kw">int</span> k = <span class="literal">1</span>, <span class="kw">int</span> a = <span class="literal">0</span>, <span class="kw">int</span> b = -<span class="literal">1</span>) {</code></div>
+<div class="code-row shaded"><span class="num">44</span><code>        <span class="kw">if</span> (b &lt; <span class="literal">0</span>) b = sz;</code></div>
+<div class="code-row shaded"><span class="num">45</span><code>        <span class="kw">if</span> (r &lt;= a || b &lt;= l) <span class="kw">return</span>;</code></div>
+<div class="code-row shaded"><span class="num">46</span><code>        <span class="kw">if</span> (l &lt;= a &amp;&amp; b &lt;= r) {</code></div>
+<div class="code-row shaded"><span class="num">47</span><code>            d[k] = f2(d[k], f, b - a);</code></div>
+<div class="code-row shaded"><span class="num">48</span><code>            <span class="kw">if</span> (k &lt; sz) lz[k] = f3(lz[k], f);</code></div>
+<div class="code-row shaded"><span class="num">49</span><code>            <span class="kw">return</span>;</code></div>
+<div class="code-row shaded"><span class="num">50</span><code>        }</code></div>
+<div class="code-row shaded"><span class="num">51</span><code>        push(k, b - a);</code></div>
+<div class="code-row shaded"><span class="num">52</span><code>        <span class="kw">int</span> m = (a + b) / <span class="literal">2</span>;</code></div>
+<div class="code-row shaded"><span class="num">53</span><code>        apply(l, r, f, k * <span class="literal">2</span>, a, m);</code></div>
+<div class="code-row shaded"><span class="num">54</span><code>        apply(l, r, f, k * <span class="literal">2</span> + <span class="literal">1</span>, m, b);</code></div>
+<div class="code-row shaded"><span class="num">55</span><code>        d[k] = f1(d[k * <span class="literal">2</span>], d[k * <span class="literal">2</span> + <span class="literal">1</span>]);</code></div>
+<div class="code-row shaded"><span class="num">56</span><code>    }</code></div>
+<div class="note expl">i番目の要素を返す</div>
+<div class="note comp">計算量 O(log n)</div>
+<div class="code-row"><span class="num">57</span><code>    T get(<span class="kw">int</span> i) { <span class="kw">return</span> query(i, i + <span class="literal">1</span>); }</code></div>
+<div class="code-row"><span class="num">58</span><code>};</code></div>
+</article></main></body></html>

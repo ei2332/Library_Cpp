@@ -1,0 +1,68 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>base</title>
+<style>
+:root {
+    color-scheme: light;
+    --ink: #20242a;
+    --muted: #737a85;
+    --rule: #d6dce4;
+    --blue: #25517c;
+    --note-bg: #edf3fa;
+    --complexity-bg: #e9ecf2;
+    --shade-bg: #fff8e3;
+    --shade-line: #a07a2f;
+}
+* { box-sizing: border-box; }
+body { margin: 0; background: #fff; color: var(--ink); font-family: system-ui, -apple-system, 'Yu Gothic', Meiryo, sans-serif; }
+main { max-width: 900px; margin: 0 auto; padding: 28px 25px 52px; }
+header { border-bottom: 1px solid var(--rule); padding: 0 0 13px; margin-bottom: 17px; }
+h1 { margin: 0 0 6px; font-size: 24px; letter-spacing: .01em; }
+.summary { font-size: 13px; line-height: 1.6; margin: 0; }
+.code-row { position: relative; display: grid; grid-template-columns: 39px minmax(0, 1fr); min-height: 19px; line-height: 19px; font: 12px/19px Consolas, 'Liberation Mono', 'Noto Sans Mono CJK JP', monospace; }
+.num { color: #8a929d; text-align: right; padding-right: 13px; user-select: none; border-right: 1px solid var(--rule); }
+.code-row code { white-space: pre; padding-left: 13px; display: block; overflow: visible; font: inherit; }
+.note { font-size: 12px; line-height: 1.55; padding: 5px 10px; margin: 6px 0 4px; break-inside: avoid; }
+.note.expl { border-left: 3px solid var(--blue); background: var(--note-bg); font-weight: 600; }
+.note.comp { background: var(--complexity-bg); color: #343f4f; border-left: 3px solid #aab3c0; }
+.note.text { border-left: 2px solid #9ba6b7; color: #4f5b6b; }
+.code-row.shaded { background: var(--shade-bg); }
+.code-row.shaded::before, .note.shaded::before {
+    content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 8px;
+    border-left: 1px solid var(--shade-line);
+    background: repeating-linear-gradient(135deg, #b29a60 0 1px, transparent 1px 4px);
+}
+.note.shaded { position: relative; background: var(--shade-bg); border-left: 0; padding-left: 14px; }
+.kw { color: #244f86; font-weight: 600; }
+.literal { color: #86521d; }
+.str { color: #24604d; }
+.comment { color: #678069; }
+@page { size: A4 portrait; margin: 13mm 12mm; }
+@media print {
+    html, body { width: auto; background: white; }
+    main { padding: 0; max-width: none; }
+    h1 { font-size: 19pt; }
+    .code-row { font-size: 9px; line-height: 14px; min-height: 14px; break-inside: avoid; }
+    .note { font-size: 10px; }
+    header { break-after: avoid; }
+    .code-row, .note { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+}
+</style>
+</head>
+<body><main><article>
+<header>
+<h1>base</h1>
+</header>
+<div class="code-row"><span class="num">1</span><code>#include &lt;bits/stdc++.h&gt;</code></div>
+<div class="code-row"><span class="num">2</span><code><span class="kw">using</span> <span class="kw">namespace</span> std;</code></div>
+<div class="code-row"><span class="num">3</span><code>#define <span class="kw">int</span> <span class="kw">long</span> <span class="kw">long</span></code></div>
+<div class="code-row"><span class="num">4</span><code></code></div>
+<div class="code-row"><span class="num">5</span><code>#ifndef DEBUG_OUT</code></div>
+<div class="code-row"><span class="num">6</span><code>#define debug(...) ((<span class="kw">void</span>)<span class="literal">0</span>)</code></div>
+<div class="code-row"><span class="num">7</span><code>#endif</code></div>
+<div class="code-row"><span class="num">8</span><code></code></div>
+<div class="code-row"><span class="num">9</span><code><span class="kw">signed</span> main() {}</code></div>
+</article></main></body></html>

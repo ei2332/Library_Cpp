@@ -1,0 +1,147 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Prime</title>
+<style>
+:root {
+    color-scheme: light;
+    --ink: #20242a;
+    --muted: #737a85;
+    --rule: #d6dce4;
+    --blue: #25517c;
+    --note-bg: #edf3fa;
+    --complexity-bg: #e9ecf2;
+    --shade-bg: #fff8e3;
+    --shade-line: #a07a2f;
+}
+* { box-sizing: border-box; }
+body { margin: 0; background: #fff; color: var(--ink); font-family: system-ui, -apple-system, 'Yu Gothic', Meiryo, sans-serif; }
+main { max-width: 900px; margin: 0 auto; padding: 28px 25px 52px; }
+header { border-bottom: 1px solid var(--rule); padding: 0 0 13px; margin-bottom: 17px; }
+h1 { margin: 0 0 6px; font-size: 24px; letter-spacing: .01em; }
+.summary { font-size: 13px; line-height: 1.6; margin: 0; }
+.code-row { position: relative; display: grid; grid-template-columns: 39px minmax(0, 1fr); min-height: 19px; line-height: 19px; font: 12px/19px Consolas, 'Liberation Mono', 'Noto Sans Mono CJK JP', monospace; }
+.num { color: #8a929d; text-align: right; padding-right: 13px; user-select: none; border-right: 1px solid var(--rule); }
+.code-row code { white-space: pre; padding-left: 13px; display: block; overflow: visible; font: inherit; }
+.note { font-size: 12px; line-height: 1.55; padding: 5px 10px; margin: 6px 0 4px; break-inside: avoid; }
+.note.expl { border-left: 3px solid var(--blue); background: var(--note-bg); font-weight: 600; }
+.note.comp { background: var(--complexity-bg); color: #343f4f; border-left: 3px solid #aab3c0; }
+.note.text { border-left: 2px solid #9ba6b7; color: #4f5b6b; }
+.code-row.shaded { background: var(--shade-bg); }
+.code-row.shaded::before, .note.shaded::before {
+    content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 8px;
+    border-left: 1px solid var(--shade-line);
+    background: repeating-linear-gradient(135deg, #b29a60 0 1px, transparent 1px 4px);
+}
+.note.shaded { position: relative; background: var(--shade-bg); border-left: 0; padding-left: 14px; }
+.kw { color: #244f86; font-weight: 600; }
+.literal { color: #86521d; }
+.str { color: #24604d; }
+.comment { color: #678069; }
+@page { size: A4 portrait; margin: 13mm 12mm; }
+@media print {
+    html, body { width: auto; background: white; }
+    main { padding: 0; max-width: none; }
+    h1 { font-size: 19pt; }
+    .code-row { font-size: 9px; line-height: 14px; min-height: 14px; break-inside: avoid; }
+    .note { font-size: 10px; }
+    header { break-after: avoid; }
+    .code-row, .note { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+}
+</style>
+</head>
+<body><main><article>
+<header>
+<h1>Prime</h1>
+<p class="summary">SPF、64bit素数判定（Miller-Rabin法）、素因数分解（Pollard Rho法）</p>
+</header>
+<div class="code-row"><span class="num">1</span><code><span class="kw">using</span> ll = <span class="kw">long</span> <span class="kw">long</span>;</code></div>
+<div class="note expl">符号付き64bit整数の素数判定</div>
+<div class="note comp">計算量 O(log n)</div>
+<div class="code-row"><span class="num">2</span><code><span class="kw">bool</span> isprime(ll n) {</code></div>
+<div class="code-row"><span class="num">3</span><code>    <span class="kw">if</span> (n &lt; <span class="literal">3</span>) <span class="kw">return</span> n == <span class="literal">2</span>;</code></div>
+<div class="code-row"><span class="num">4</span><code>    <span class="kw">if</span> (!(n &amp; <span class="literal">1</span>)) <span class="kw">return</span> <span class="kw">false</span>;</code></div>
+<div class="code-row"><span class="num">5</span><code></code></div>
+<div class="code-row"><span class="num">6</span><code>    ll d = n - <span class="literal">1</span>;</code></div>
+<div class="code-row"><span class="num">7</span><code>    <span class="kw">int</span> s = <span class="literal">0</span>;</code></div>
+<div class="code-row"><span class="num">8</span><code>    <span class="kw">while</span> (!(d &amp; <span class="literal">1</span>)) d &gt;&gt;= <span class="literal">1</span>, s++;</code></div>
+<div class="code-row"><span class="num">9</span><code></code></div>
+<div class="code-row"><span class="num">10</span><code>    <span class="kw">for</span> (ll a : {<span class="literal">2</span>, <span class="literal">325</span>, <span class="literal">9375</span>, <span class="literal">28178</span>, <span class="literal">450775</span>, <span class="literal">9780504</span>, <span class="literal">1795265022</span>}) {</code></div>
+<div class="code-row"><span class="num">11</span><code>        a %= n;</code></div>
+<div class="code-row"><span class="num">12</span><code>        <span class="kw">if</span> (!a) <span class="kw">continue</span>;</code></div>
+<div class="code-row"><span class="num">13</span><code></code></div>
+<div class="code-row"><span class="num">14</span><code>        ll x = <span class="literal">1</span>, v = a, e = d;</code></div>
+<div class="code-row"><span class="num">15</span><code>        <span class="kw">while</span> (e) {</code></div>
+<div class="code-row"><span class="num">16</span><code>            <span class="kw">if</span> (e &amp; <span class="literal">1</span>) x = (__int128)x * v % n;</code></div>
+<div class="code-row"><span class="num">17</span><code>            v = (__int128)v * v % n;</code></div>
+<div class="code-row"><span class="num">18</span><code>            e &gt;&gt;= <span class="literal">1</span>;</code></div>
+<div class="code-row"><span class="num">19</span><code>        }</code></div>
+<div class="code-row"><span class="num">20</span><code></code></div>
+<div class="code-row"><span class="num">21</span><code>        <span class="kw">if</span> (x == <span class="literal">1</span>) <span class="kw">continue</span>;</code></div>
+<div class="code-row"><span class="num">22</span><code>        <span class="kw">for</span> (<span class="kw">int</span> i = <span class="literal">0</span>; i &lt; s; i++) {</code></div>
+<div class="code-row"><span class="num">23</span><code>            <span class="kw">if</span> (x == n - <span class="literal">1</span>) <span class="kw">break</span>;</code></div>
+<div class="code-row"><span class="num">24</span><code>            x = (__int128)x * x % n;</code></div>
+<div class="code-row"><span class="num">25</span><code>        }</code></div>
+<div class="code-row"><span class="num">26</span><code>        <span class="kw">if</span> (x != n - <span class="literal">1</span>) <span class="kw">return</span> <span class="kw">false</span>;</code></div>
+<div class="code-row"><span class="num">27</span><code>    }</code></div>
+<div class="code-row"><span class="num">28</span><code>    <span class="kw">return</span> <span class="kw">true</span>;</code></div>
+<div class="code-row"><span class="num">29</span><code>}</code></div>
+<div class="note expl">最小素因数表と素数列をO(N)で構築する</div>
+<div class="note comp">計算量 O(N)</div>
+<div class="code-row"><span class="num">30</span><code><span class="kw">struct</span> SPF {</code></div>
+<div class="code-row"><span class="num">31</span><code>    vector&lt;<span class="kw">int</span>&gt; p, t;</code></div>
+<div class="code-row"><span class="num">32</span><code>    SPF(<span class="kw">int</span> n) : t(n + <span class="literal">1</span>) {</code></div>
+<div class="code-row"><span class="num">33</span><code>        <span class="kw">for</span> (<span class="kw">int</span> i = <span class="literal">2</span>; i &lt;= n; i++) {</code></div>
+<div class="code-row"><span class="num">34</span><code>            <span class="kw">if</span> (!t[i]) {</code></div>
+<div class="code-row"><span class="num">35</span><code>                p.push_back(i);</code></div>
+<div class="code-row"><span class="num">36</span><code>                t[i] = i;</code></div>
+<div class="code-row"><span class="num">37</span><code>            }</code></div>
+<div class="code-row"><span class="num">38</span><code>            <span class="kw">for</span> (<span class="kw">auto</span>&amp; j : p) {</code></div>
+<div class="code-row"><span class="num">39</span><code>                <span class="kw">if</span> (j &gt; t[i] || i &gt; n / j) <span class="kw">break</span>;</code></div>
+<div class="code-row"><span class="num">40</span><code>                t[i * j] = j;</code></div>
+<div class="code-row"><span class="num">41</span><code>            }</code></div>
+<div class="code-row"><span class="num">42</span><code>        }</code></div>
+<div class="code-row"><span class="num">43</span><code>    }</code></div>
+<div class="note expl">素因数を重複込みでrの末尾に追加する。1 &lt;= n &lt;= N</div>
+<div class="note comp">計算量 O(log n)</div>
+<div class="code-row"><span class="num">44</span><code>    <span class="kw">void</span> fact(<span class="kw">int</span> n, vector&lt;ll&gt;&amp; r) {</code></div>
+<div class="code-row"><span class="num">45</span><code>        <span class="kw">while</span> (n &gt; <span class="literal">1</span>) n /= r.emplace_back(t[n]);</code></div>
+<div class="code-row"><span class="num">46</span><code>    }</code></div>
+<div class="code-row"><span class="num">47</span><code>};</code></div>
+<div class="note expl">合成数nの非自明な約数を1つ返す</div>
+<div class="code-row"><span class="num">48</span><code>ll rho(ll n) {</code></div>
+<div class="code-row"><span class="num">49</span><code>    <span class="kw">if</span> (<span class="literal">1</span> - n % <span class="literal">2</span>) <span class="kw">return</span> <span class="literal">2</span>;</code></div>
+<div class="code-row"><span class="num">50</span><code>    <span class="kw">for</span> (ll c = <span class="literal">1</span>;; c++) {</code></div>
+<div class="code-row"><span class="num">51</span><code>        <span class="kw">auto</span> f = [&amp;](ll x) -&gt; ll { <span class="kw">return</span> ((__int128)x * x + c) % n; };</code></div>
+<div class="code-row"><span class="num">52</span><code>        ll x = <span class="literal">2</span>, y = <span class="literal">2</span>;</code></div>
+<div class="code-row"><span class="num">53</span><code>        <span class="kw">while</span> (<span class="kw">true</span>) {</code></div>
+<div class="code-row"><span class="num">54</span><code>            x = f(x), y = f(f(y));</code></div>
+<div class="code-row"><span class="num">55</span><code>            ll d = gcd(abs(x - y), n);</code></div>
+<div class="code-row"><span class="num">56</span><code>            <span class="kw">if</span> (d == n) <span class="kw">break</span>;</code></div>
+<div class="code-row"><span class="num">57</span><code>            <span class="kw">if</span> (d - <span class="literal">1</span>) <span class="kw">return</span> d;</code></div>
+<div class="code-row"><span class="num">58</span><code>        }</code></div>
+<div class="code-row"><span class="num">59</span><code>    }</code></div>
+<div class="code-row"><span class="num">60</span><code>}</code></div>
+<div class="code-row"><span class="num">61</span><code></code></div>
+<div class="code-row"><span class="num">62</span><code>#ifdef PRIME_SPF_BOOST</code></div>
+<div class="code-row"><span class="num">63</span><code>SPF _spf(<span class="literal">1000000</span>);</code></div>
+<div class="code-row"><span class="num">64</span><code>#endif</code></div>
+<div class="note expl">素因数を重複込みでrの末尾に追加する。必要ならsort(r.begin(),r.end())</div>
+<div class="code-row"><span class="num">65</span><code><span class="kw">void</span> fact(ll n, vector&lt;ll&gt;&amp; r) {</code></div>
+<div class="code-row"><span class="num">66</span><code>    <span class="kw">if</span> (n &lt; <span class="literal">2</span>) <span class="kw">return</span>;</code></div>
+<div class="code-row"><span class="num">67</span><code>#ifdef PRIME_SPF_BOOST</code></div>
+<div class="code-row"><span class="num">68</span><code>    <span class="kw">if</span> (n &lt;= <span class="literal">1000000</span>) {</code></div>
+<div class="code-row"><span class="num">69</span><code>        _spf.fact(n, r);</code></div>
+<div class="code-row"><span class="num">70</span><code>        <span class="kw">return</span>;</code></div>
+<div class="code-row"><span class="num">71</span><code>    }</code></div>
+<div class="code-row"><span class="num">72</span><code>#endif</code></div>
+<div class="code-row"><span class="num">73</span><code>    <span class="kw">if</span> (isprime(n)) r.push_back(n);</code></div>
+<div class="code-row"><span class="num">74</span><code>    <span class="kw">else</span> {</code></div>
+<div class="code-row"><span class="num">75</span><code>        ll d = rho(n);</code></div>
+<div class="code-row"><span class="num">76</span><code>        fact(d, r);</code></div>
+<div class="code-row"><span class="num">77</span><code>        fact(n / d, r);</code></div>
+<div class="code-row"><span class="num">78</span><code>    }</code></div>
+<div class="code-row"><span class="num">79</span><code>}</code></div>
+</article></main></body></html>

@@ -1,0 +1,161 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ModInt</title>
+<style>
+:root {
+    color-scheme: light;
+    --ink: #20242a;
+    --muted: #737a85;
+    --rule: #d6dce4;
+    --blue: #25517c;
+    --note-bg: #edf3fa;
+    --complexity-bg: #e9ecf2;
+    --shade-bg: #fff8e3;
+    --shade-line: #a07a2f;
+}
+* { box-sizing: border-box; }
+body { margin: 0; background: #fff; color: var(--ink); font-family: system-ui, -apple-system, 'Yu Gothic', Meiryo, sans-serif; }
+main { max-width: 900px; margin: 0 auto; padding: 28px 25px 52px; }
+header { border-bottom: 1px solid var(--rule); padding: 0 0 13px; margin-bottom: 17px; }
+h1 { margin: 0 0 6px; font-size: 24px; letter-spacing: .01em; }
+.summary { font-size: 13px; line-height: 1.6; margin: 0; }
+.code-row { position: relative; display: grid; grid-template-columns: 39px minmax(0, 1fr); min-height: 19px; line-height: 19px; font: 12px/19px Consolas, 'Liberation Mono', 'Noto Sans Mono CJK JP', monospace; }
+.num { color: #8a929d; text-align: right; padding-right: 13px; user-select: none; border-right: 1px solid var(--rule); }
+.code-row code { white-space: pre; padding-left: 13px; display: block; overflow: visible; font: inherit; }
+.note { font-size: 12px; line-height: 1.55; padding: 5px 10px; margin: 6px 0 4px; break-inside: avoid; }
+.note.expl { border-left: 3px solid var(--blue); background: var(--note-bg); font-weight: 600; }
+.note.comp { background: var(--complexity-bg); color: #343f4f; border-left: 3px solid #aab3c0; }
+.note.text { border-left: 2px solid #9ba6b7; color: #4f5b6b; }
+.code-row.shaded { background: var(--shade-bg); }
+.code-row.shaded::before, .note.shaded::before {
+    content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 8px;
+    border-left: 1px solid var(--shade-line);
+    background: repeating-linear-gradient(135deg, #b29a60 0 1px, transparent 1px 4px);
+}
+.note.shaded { position: relative; background: var(--shade-bg); border-left: 0; padding-left: 14px; }
+.kw { color: #244f86; font-weight: 600; }
+.literal { color: #86521d; }
+.str { color: #24604d; }
+.comment { color: #678069; }
+@page { size: A4 portrait; margin: 13mm 12mm; }
+@media print {
+    html, body { width: auto; background: white; }
+    main { padding: 0; max-width: none; }
+    h1 { font-size: 19pt; }
+    .code-row { font-size: 9px; line-height: 14px; min-height: 14px; break-inside: avoid; }
+    .note { font-size: 10px; }
+    header { break-after: avoid; }
+    .code-row, .note { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+}
+</style>
+</head>
+<body><main><article>
+<header>
+<h1>ModInt</h1>
+<p class="summary">固定法の剰余整数、CRT、組合せ計算</p>
+</header>
+<div class="code-row"><span class="num">1</span><code><span class="kw">using</span> ll = <span class="kw">long</span> <span class="kw">long</span>;</code></div>
+<div class="code-row"><span class="num">2</span><code></code></div>
+<div class="code-row"><span class="num">3</span><code><span class="kw">template</span> &lt;<span class="kw">int</span> MOD&gt;</code></div>
+<div class="code-row"><span class="num">4</span><code><span class="kw">struct</span> mint {</code></div>
+<div class="code-row"><span class="num">5</span><code>    <span class="kw">int</span> v;</code></div>
+<div class="code-row"><span class="num">6</span><code>    mint(ll x = <span class="literal">0</span>) {</code></div>
+<div class="code-row"><span class="num">7</span><code>        x %= MOD;</code></div>
+<div class="code-row"><span class="num">8</span><code>        <span class="kw">if</span> (x &lt; <span class="literal">0</span>) x += MOD;</code></div>
+<div class="code-row"><span class="num">9</span><code>        v = x;</code></div>
+<div class="code-row"><span class="num">10</span><code>    }</code></div>
+<div class="code-row"><span class="num">11</span><code>    mint&amp; <span class="kw">operator</span>+=(<span class="kw">const</span> mint&amp; o) {</code></div>
+<div class="code-row"><span class="num">12</span><code>        v += o.v;</code></div>
+<div class="code-row"><span class="num">13</span><code>        <span class="kw">if</span> (v &gt;= MOD) v -= MOD;</code></div>
+<div class="code-row"><span class="num">14</span><code>        <span class="kw">return</span> *this;</code></div>
+<div class="code-row"><span class="num">15</span><code>    }</code></div>
+<div class="code-row"><span class="num">16</span><code>    mint&amp; <span class="kw">operator</span>-=(<span class="kw">const</span> mint&amp; o) {</code></div>
+<div class="code-row"><span class="num">17</span><code>        v -= o.v;</code></div>
+<div class="code-row"><span class="num">18</span><code>        <span class="kw">if</span> (v &lt; <span class="literal">0</span>) v += MOD;</code></div>
+<div class="code-row"><span class="num">19</span><code>        <span class="kw">return</span> *this;</code></div>
+<div class="code-row"><span class="num">20</span><code>    }</code></div>
+<div class="code-row"><span class="num">21</span><code>    mint&amp; <span class="kw">operator</span>*=(<span class="kw">const</span> mint&amp; o) {</code></div>
+<div class="code-row"><span class="num">22</span><code>        v = ll(v) * o.v % MOD;</code></div>
+<div class="code-row"><span class="num">23</span><code>        <span class="kw">return</span> *this;</code></div>
+<div class="code-row"><span class="num">24</span><code>    }</code></div>
+<div class="code-row"><span class="num">25</span><code>    mint&amp; <span class="kw">operator</span>/=(<span class="kw">const</span> mint&amp; o) {</code></div>
+<div class="code-row"><span class="num">26</span><code>        <span class="kw">auto</span> [g, x] = o.inv_gcd();</code></div>
+<div class="code-row"><span class="num">27</span><code>        assert(g == <span class="literal">1</span>);</code></div>
+<div class="code-row"><span class="num">28</span><code>        <span class="kw">return</span> *this *= x;</code></div>
+<div class="code-row"><span class="num">29</span><code>    }</code></div>
+<div class="code-row"><span class="num">30</span><code>    <span class="kw">friend</span> mint <span class="kw">operator</span>+(mint a, <span class="kw">const</span> mint&amp; b) { <span class="kw">return</span> a += b; }</code></div>
+<div class="code-row"><span class="num">31</span><code>    <span class="kw">friend</span> mint <span class="kw">operator</span>-(mint a, <span class="kw">const</span> mint&amp; b) { <span class="kw">return</span> a -= b; }</code></div>
+<div class="code-row"><span class="num">32</span><code>    <span class="kw">friend</span> mint <span class="kw">operator</span>*(mint a, <span class="kw">const</span> mint&amp; b) { <span class="kw">return</span> a *= b; }</code></div>
+<div class="code-row"><span class="num">33</span><code>    <span class="kw">friend</span> mint <span class="kw">operator</span>/(mint a, <span class="kw">const</span> mint&amp; b) { <span class="kw">return</span> a /= b; }</code></div>
+<div class="code-row"><span class="num">34</span><code>    <span class="kw">bool</span> <span class="kw">operator</span>==(<span class="kw">const</span> mint&amp;) <span class="kw">const</span> = default;</code></div>
+<div class="note expl">n乗を返す</div>
+<div class="note comp">計算量 O(log n)</div>
+<div class="code-row"><span class="num">35</span><code>    mint pow(ll n) <span class="kw">const</span> {</code></div>
+<div class="code-row"><span class="num">36</span><code>        mint x = *this, r = <span class="literal">1</span>;</code></div>
+<div class="code-row"><span class="num">37</span><code>        <span class="kw">while</span> (n) {</code></div>
+<div class="code-row"><span class="num">38</span><code>            <span class="kw">if</span> (n &amp; <span class="literal">1</span>) r *= x;</code></div>
+<div class="code-row"><span class="num">39</span><code>            x *= x;</code></div>
+<div class="code-row"><span class="num">40</span><code>            n &gt;&gt;= <span class="literal">1</span>;</code></div>
+<div class="code-row"><span class="num">41</span><code>        }</code></div>
+<div class="code-row"><span class="num">42</span><code>        <span class="kw">return</span> r;</code></div>
+<div class="code-row"><span class="num">43</span><code>    }</code></div>
+<div class="note expl">(g,x)を返す。v*x ≡ g (mod MOD)、g = gcd(v,MOD)</div>
+<div class="note comp">計算量 O(log MOD)</div>
+<div class="code-row"><span class="num">44</span><code>    pair&lt;<span class="kw">int</span>, <span class="kw">int</span>&gt; inv_gcd() <span class="kw">const</span> {</code></div>
+<div class="code-row"><span class="num">45</span><code>        ll a = MOD, b = v, x = <span class="literal">0</span>, y = <span class="literal">1</span>, q;</code></div>
+<div class="code-row"><span class="num">46</span><code>        <span class="kw">while</span> (b) {</code></div>
+<div class="code-row"><span class="num">47</span><code>            q = a / b;</code></div>
+<div class="code-row"><span class="num">48</span><code>            swap(a -= q * b, b);</code></div>
+<div class="code-row"><span class="num">49</span><code>            swap(x -= q * y, y);</code></div>
+<div class="code-row"><span class="num">50</span><code>        }</code></div>
+<div class="code-row"><span class="num">51</span><code>        <span class="kw">if</span> (x &lt; <span class="literal">0</span>) x += MOD / a;</code></div>
+<div class="code-row"><span class="num">52</span><code>        <span class="kw">return</span> {a, x};</code></div>
+<div class="code-row"><span class="num">53</span><code>    }</code></div>
+<div class="code-row"><span class="num">54</span><code>};</code></div>
+<div class="note expl">a ≡ x (mod P), a ≡ y (mod Q) を統合する</div>
+<div class="note text">解なしなら-1。結果は[0,lcm(P,Q))に正規化</div>
+<div class="note comp">計算量 O(log min(P,Q))</div>
+<div class="code-row"><span class="num">55</span><code><span class="kw">template</span> &lt;<span class="kw">int</span> P, <span class="kw">int</span> Q&gt;</code></div>
+<div class="code-row"><span class="num">56</span><code>ll crt(mint&lt;P&gt; x, mint&lt;Q&gt; y) {</code></div>
+<div class="code-row"><span class="num">57</span><code>    <span class="kw">auto</span> [g, inv] = mint&lt;P&gt;(Q).inv_gcd();</code></div>
+<div class="code-row"><span class="num">58</span><code>    <span class="kw">int</span> d = x.v - y.v, p = P / g;</code></div>
+<div class="code-row"><span class="num">59</span><code>    <span class="kw">if</span> (d % g) <span class="kw">return</span> -<span class="literal">1</span>;</code></div>
+<div class="code-row"><span class="num">60</span><code>    <span class="kw">int</span> t = d / g % p;</code></div>
+<div class="code-row"><span class="num">61</span><code>    <span class="kw">if</span> (t &lt; <span class="literal">0</span>) t += p;</code></div>
+<div class="code-row"><span class="num">62</span><code>    <span class="kw">return</span> y.v + ll(t) * inv % p * Q;</code></div>
+<div class="code-row"><span class="num">63</span><code>}</code></div>
+<div class="note text">階乗が可逆である範囲を前計算する</div>
+<div class="note text">素数MODの場合、前計算上限N &lt; MOD</div>
+<div class="code-row"><span class="num">64</span><code><span class="kw">struct</span> Comb {</code></div>
+<div class="code-row"><span class="num">65</span><code>    <span class="kw">using</span> T = mint&lt;<span class="literal">998244353</span>&gt;;</code></div>
+<div class="code-row"><span class="num">66</span><code>    vector&lt;T&gt; fact, ifact;</code></div>
+<div class="note comp">計算量 O(N + log MOD)</div>
+<div class="code-row"><span class="num">67</span><code>    Comb(<span class="kw">int</span> n) : fact(n + <span class="literal">1</span>), ifact(n + <span class="literal">1</span>) {</code></div>
+<div class="code-row"><span class="num">68</span><code>        fact[<span class="literal">0</span>] = <span class="literal">1</span>;</code></div>
+<div class="code-row"><span class="num">69</span><code>        <span class="kw">for</span> (<span class="kw">int</span> i = <span class="literal">1</span>; i &lt;= n; i++) fact[i] = fact[i - <span class="literal">1</span>] * i;</code></div>
+<div class="code-row"><span class="num">70</span><code>        ifact[n] = fact[n].inv_gcd().second;</code></div>
+<div class="code-row"><span class="num">71</span><code>        <span class="kw">for</span> (<span class="kw">int</span> i = n; i &gt; <span class="literal">0</span>; i--) ifact[i - <span class="literal">1</span>] = ifact[i] * i;</code></div>
+<div class="code-row"><span class="num">72</span><code>    }</code></div>
+<div class="note expl">組合せ nCr</div>
+<div class="note comp">計算量 O(1)</div>
+<div class="code-row"><span class="num">73</span><code>    T C(<span class="kw">int</span> n, <span class="kw">int</span> r) <span class="kw">const</span> {</code></div>
+<div class="code-row"><span class="num">74</span><code>        <span class="kw">if</span> (n &lt; <span class="literal">0</span> || r &lt; <span class="literal">0</span> || r &gt; n) <span class="kw">return</span> <span class="literal">0</span>;</code></div>
+<div class="code-row"><span class="num">75</span><code>        <span class="kw">return</span> fact[n] * ifact[r] * ifact[n - r];</code></div>
+<div class="code-row"><span class="num">76</span><code>    }</code></div>
+<div class="note expl">順列 nPr</div>
+<div class="note comp">計算量 O(1)</div>
+<div class="code-row"><span class="num">77</span><code>    T P(<span class="kw">int</span> n, <span class="kw">int</span> r) <span class="kw">const</span> {</code></div>
+<div class="code-row"><span class="num">78</span><code>        <span class="kw">if</span> (n &lt; <span class="literal">0</span> || r &lt; <span class="literal">0</span> || r &gt; n) <span class="kw">return</span> <span class="literal">0</span>;</code></div>
+<div class="code-row"><span class="num">79</span><code>        <span class="kw">return</span> fact[n] * ifact[n - r];</code></div>
+<div class="code-row"><span class="num">80</span><code>    }</code></div>
+<div class="note expl">重複組合せ nHr</div>
+<div class="note comp">計算量 O(1)</div>
+<div class="code-row"><span class="num">81</span><code>    T H(<span class="kw">int</span> n, <span class="kw">int</span> r) <span class="kw">const</span> {</code></div>
+<div class="code-row"><span class="num">82</span><code>        <span class="kw">if</span> (n &lt;= <span class="literal">0</span> || r &lt; <span class="literal">0</span>) <span class="kw">return</span> (n | r) == <span class="literal">0</span>;</code></div>
+<div class="code-row"><span class="num">83</span><code>        <span class="kw">return</span> C(n + r - <span class="literal">1</span>, r);</code></div>
+<div class="code-row"><span class="num">84</span><code>    }</code></div>
+<div class="code-row"><span class="num">85</span><code>};</code></div>
+</article></main></body></html>
