@@ -3,6 +3,7 @@ import sys
 import os
 import shlex
 import argparse
+import json
 import subprocess
 
 # ===== グローバル変数 =====
@@ -266,6 +267,7 @@ def main():
     group.add_argument("-c", nargs="?", action="append", const="")
     group.add_argument("-u", action="store_true")
     group.add_argument("--html", action="store_true", help="generate printable HTML (excluding include scope)")
+    group.add_argument("--metadata", action="store_true", help="output name and description as JSON")
 
     args = parser.parse_args()
 
@@ -300,6 +302,11 @@ def main():
                 if check > len(checks):
                     raise ValueError("@check index out of range")
                 Rerun(*checks[check - 1])
+
+        elif args.metadata:
+            if library_name is None:
+                raise ValueError("@name is not defined")
+            print(json.dumps({"name": library_name, "description": " ".join(description or [])}, ensure_ascii=False))
 
         elif args.html:
             if library_name is None:

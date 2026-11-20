@@ -76,6 +76,14 @@ class HtmlTests(unittest.TestCase):
         self.assertIn("int forbidden", c.stdout)
         self.assertIn("https://example.org/check", c.stderr)
 
+    def test_metadata_for_site_index(self):
+        result = cli(SOURCE, "--metadata")
+        self.assertEqual(result.returncode, 0, result.stderr)
+        import json
+        self.assertEqual(json.loads(result.stdout), {
+            "name": "Example", "description": "説明です"
+        })
+
     def test_html_escape_and_lexical_highlight(self):
         source = """//// @name X
 bool a = (x < 5 && y > 0); // a&b
