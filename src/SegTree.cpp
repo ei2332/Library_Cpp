@@ -1,6 +1,7 @@
 //// @url https://github.com/ei2332/Library_Cpp/blob/main/src/SegTree.cpp
 //// @name SegTree
 //// @expl モノイドによる区間集約と点更新を行うセグメント木。lazyスコープでは区間更新にも対応する。
+//// @shade lazy
 //// @check https://judge.yosupo.jp/problem/point_add_range_sum include check_sum
 //// @check https://atcoder.jp/contests/abc340/tasks/abc340_e include lazy check_mancala
 //// @check https://judge.yosupo.jp/problem/range_affine_range_sum include lazy check_affine

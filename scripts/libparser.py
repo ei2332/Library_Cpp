@@ -11,6 +11,8 @@ text = ""
 scopes = []
 checks = []
 checked = []
+shades = []
+print_items = []
 
 library_name = None
 reference_url = None
@@ -87,6 +89,16 @@ def _checked(args):
     return False
 
 
+def _shade(args):
+    Argc("@shade", args, 1, 1)
+    if args[0] == "include":
+        raise ValueError("@shade: include scope is not printable")
+    if args[0] in shades:
+        raise ValueError("duplicate @shade")
+    shades.append(args[0])
+    return False
+
+
 def _expl(args):
     Argc("expl", args, 1)
     return True
@@ -139,6 +151,7 @@ COMMANDS = {
     "@expl": _global_expl,
     "@check": _check,
     "@checked": _checked,
+    "@shade": _shade,
     "expl": _expl,
     "comp": _comp,
     "text": _text,
@@ -167,7 +180,7 @@ def ScopeValidate() -> None:
             raise ValueError("missing line after !!")
         raise ValueError(f"unclosed scope: {active_scope}")
 
-    unknown = set(scopes) - defined_scopes
+    unknown = (set(scopes) | set(shades)) - defined_scopes
     if unknown:
         raise ValueError(f"undefined scope: {sorted(unknown)}")
 
@@ -180,6 +193,7 @@ def Parse() -> str:
     for n, line in enumerate(text.splitlines(keepends=True), 1):
         target = single_scope
         visible = True
+        tag, args = None, []
 
         try:
             s = line.lstrip(" \t")
@@ -198,6 +212,12 @@ def Parse() -> str:
 
             if visible and ScopeVisible():
                 result.append(line)
+
+            # Keep the original scope for print rendering without changing C++ output.
+            if tag is None:
+                print_items.append((active_scope, "code", line.rstrip("\r\n")))
+            elif tag in {"expl", "comp", "text"}:
+                print_items.append((active_scope, tag, " ".join(args)))
 
             ScopeNext(target)
 
@@ -245,6 +265,7 @@ def main():
     group.add_argument("-s", action="append", default=[])
     group.add_argument("-c", nargs="?", action="append", const="")
     group.add_argument("-u", action="store_true")
+    group.add_argument("--html", action="store_true", help="generate printable HTML (excluding include scope)")
 
     args = parser.parse_args()
 
@@ -279,6 +300,12 @@ def main():
                 if check > len(checks):
                     raise ValueError("@check index out of range")
                 Rerun(*checks[check - 1])
+
+        elif args.html:
+            if library_name is None:
+                raise ValueError("@name is not defined")
+            from print_html import render
+            sys.stdout.buffer.write(render(library_name, " ".join(description or []), print_items, shades).encode("utf-8"))
 
         else:
             sys.stdout.buffer.write(parseStr.encode("utf-8"))
