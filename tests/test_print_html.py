@@ -64,6 +64,30 @@ class HtmlTests(unittest.TestCase):
         self.assertIn("計算量 O(log n)", h.stdout)
         self.assertNotIn(">comp ", h.stdout)
 
+    def test_screen_two_columns_and_print_three_columns(self):
+        h = cli(SOURCE, "--html")
+        self.assertEqual(h.returncode, 0, h.stderr)
+        self.assertIn('class="screen-layout"', h.stdout)
+        self.assertIn('class="screen-code"', h.stdout)
+        self.assertIn('class="screen-notes"', h.stdout)
+        self.assertIn('grid-template-columns:minmax(0,65fr) minmax(310px,35fr)', h.stdout)
+        self.assertIn('grid-template-columns:repeat(3,minmax(0,1fr))', h.stdout)
+        self.assertIn('@page{size:A4 landscape;margin:0}', h.stdout)
+        self.assertIn('id="print-pages"', h.stdout)
+        self.assertIn('class="note-start"', h.stdout)
+        self.assertIn('href="#line-2"', h.stdout)
+        self.assertLess(h.stdout.index('data-no="6"'), h.stdout.index('class="note-start"'))
+        self.assertIn('padding-left:2ch;text-indent:-2ch', h.stdout)
+
+    def test_notes_are_attached_to_next_code_line(self):
+        h = cli(SOURCE, "--html")
+        self.assertEqual(h.returncode, 0, h.stderr)
+        self.assertIn('href="#line-2"', h.stdout)
+        self.assertIn('説明文', h.stdout)
+        self.assertIn('計算量 O(log n)', h.stdout)
+        self.assertIn('補足', h.stdout)
+        self.assertNotIn('#include', h.stdout)
+
     def test_cpp_legacy_outputs(self):
         r = cli(SOURCE, "-s", "include")
         self.assertEqual(r.returncode, 0, r.stderr)
