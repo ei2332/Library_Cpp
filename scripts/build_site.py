@@ -8,6 +8,8 @@ from pathlib import Path
 import subprocess
 import sys
 
+from print_html import render_all
+
 ROOT = Path(__file__).resolve().parents[1]
 SOURCES = ROOT / "src"
 PARSER = ROOT / "scripts" / "libparser.py"
@@ -27,12 +29,14 @@ def parse(source: bytes, option: str) -> str:
 def build(output: Path) -> int:
     output.mkdir(parents=True, exist_ok=True)
     entries = []
+    rendered_pages = []
     files = sorted(p for p in SOURCES.rglob("*") if p.is_file() and p.suffix in EXTENSIONS)
     for path in files:
         relative = path.relative_to(SOURCES)
         source = path.read_bytes()
         metadata = json.loads(parse(source, "--metadata"))
         rendered = parse(source, "--html")
+        rendered_pages.append(rendered)
         target = output / "lib" / relative.with_suffix(".html")
         target.parent.mkdir(parents=True, exist_ok=True)
         target.write_text(rendered, encoding="utf-8")
@@ -40,6 +44,8 @@ def build(output: Path) -> int:
         print(f"[HTML] {relative} -> {target.relative_to(output)}", flush=True)
 
     entries.sort(key=lambda item: (item[0].casefold(), item[2]))
+    (output / "all.html").write_text(render_all(rendered_pages), encoding="utf-8")
+    print(f"[HTML] all.html: {len(rendered_pages)} libraries", flush=True)
     listing = []
     for name, description, href in entries:
         listing.append(
@@ -66,7 +72,7 @@ span{display:block;margin-top:4px;font-size:13px;color:#4d5866}
 @media print{main{padding:0}a{color:#20242a}li{break-inside:avoid}}
 </style>
 </head>
-<body><main><h1>Library_Cpp</h1><ul>
+<body><main><h1>Library_Cpp</h1><p><a href="all.html">すべてのライブラリをまとめて見る / 印刷する</a></p><ul>
 """ + "\n".join(listing) + """
 </ul></main></body></html>
 """

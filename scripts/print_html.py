@@ -37,6 +37,9 @@ body{background:#f1f3f6;color:var(--ink);font-family:system-ui,-apple-system,'Yu
 .target code{display:block;padding:7px 9px 7px 2px;white-space:pre-wrap;overflow-wrap:anywhere;min-width:0;font:12px/20px 'Liberation Mono',monospace}
 .description{padding:7px 0 0 12px}.meta{font-size:12px;line-height:1.6;margin:0 0 4px;overflow-wrap:anywhere}
 .meta.expl{font-weight:600}.meta.comp{color:#43586d}.meta.text{color:#4c5c6c}
+.screen-layout+.screen-layout{margin-top:26px}
+.library-separator{border-top:1px solid var(--rule);margin:0 0 12px}
+#print-pages .library-separator{border-top:.35mm solid #8797a8;margin:2mm 0 2mm}
 #print-pages{position:absolute;left:-10000px;top:0;visibility:hidden}
 .sheet{width:297mm;height:210mm;padding:7mm 7.8mm 5mm;display:flex;flex-direction:column;background:white;overflow:hidden;break-after:page}
 .sheet:last-child{break-after:auto}
@@ -75,14 +78,28 @@ html,body{background:white!important}#screen{display:none!important}
 
 JS = r"""
 (() => {
-const blocks=Array.from(document.querySelector('#source').children);
-const screenCode=document.querySelector('.screen-code');
-const screenNotes=document.querySelector('.screen-notes');
+const screen=document.querySelector('#screen');
 const pages=document.querySelector('#print-pages');
-for(const block of blocks){
-const copy=block.cloneNode(true);
-(block.classList.contains('note')||block.classList.contains('note-start')?screenNotes:screenCode).appendChild(copy);
+const source=document.querySelector('#source');
+const groups=Array.from(source.querySelectorAll(':scope > .library-source'));
+if(!groups.length) groups.push(source);
+const blocks=[];
+screen.replaceChildren();
+groups.forEach((group,index)=>{
+if(index){
+const spacer=document.createElement('div');spacer.className='library-separator';
+blocks.push(spacer);
 }
+const layout=document.createElement('section');layout.className='screen-layout';
+layout.innerHTML='<article class="screen-code"></article><aside class="screen-notes" aria-label="説明"></aside>';
+const code=layout.querySelector('.screen-code'),notes=layout.querySelector('.screen-notes');
+for(const block of group.children){
+blocks.push(block);
+const copy=block.cloneNode(true);
+(block.classList.contains('note')||block.classList.contains('note-start')?notes:code).appendChild(copy);
+}
+screen.appendChild(layout);
+});
 function buildPrint(){
 pages.replaceChildren();
 let sheet,colIndex=0,pageNumber=0;
@@ -185,3 +202,38 @@ def render(name, description, items, shaded_scopes):
 <aside class="screen-notes" aria-label="説明"></aside></div></main>
 <div id="print-pages" aria-hidden="true"></div><script>{JS}</script></body></html>
 '''
+
+
+def render_all(pages):
+    """Join individually rendered HTML pages while sharing their screen/print renderer.
+
+    Each library's original source fragment is preserved. Identifiers are
+    namespaced so line-number links do not collide across libraries.
+    """
+    if not pages:
+        raise ValueError("no HTML pages to combine")
+    marker = re.compile(
+        r'(<div id="source" hidden>)(.*?)(</div>\s*<main id="screen">)',
+        re.DOTALL,
+    )
+    combined = []
+    for index, page in enumerate(pages, 1):
+        match = marker.search(page)
+        if not match:
+            raise ValueError(f"missing source element in HTML page #{index}")
+        fragment = match.group(2)
+        prefix = f'lib{index}-'
+        fragment = re.sub(
+            r'(?:id="line-|href="#line-)(\d+)"',
+            lambda m: m.group(0).replace('line-', f'{prefix}line-', 1),
+            fragment,
+        )
+        combined.append('<section class="library-source">\n' + fragment
+                        + '\n</section>')
+    result = marker.sub(
+        lambda m: m.group(1) + '\n'.join(combined) + m.group(3),
+        pages[0],
+        count=1,
+    )
+    return re.sub(r'<title>.*?</title>',
+                  '<title>Library_Cpp — All</title>', result, count=1)

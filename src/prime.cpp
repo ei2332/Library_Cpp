@@ -1,10 +1,11 @@
 //// @url https://github.com/ei2332/Library_Cpp/blob/main/src/prime.cpp
 //// @name Prime
 //// @expl SPF、64bit素数判定（Miller-Rabin法）、素因数分解（Pollard Rho法）
+//// @shade spf_boost
 //// @check https://judge.yosupo.jp/problem/primality_test include check_primality
 //// @check https://judge.yosupo.jp/problem/primality_test no_macro check_primality
 //// @check https://judge.yosupo.jp/problem/factorize no_macro check_factorize
-//// @check https://judge.yosupo.jp/problem/factorize include_boost check_factorize
+//// @check https://judge.yosupo.jp/problem/factorize include spf_boost check_factorize
 //// @check https://atcoder.jp/contests/abc084/tasks/abc084_d include check_spf
 //// @check https://atcoder.jp/contests/abc084/tasks/abc084_d no_macro check_spf
 //// ! include
@@ -16,13 +17,6 @@ using namespace std;
 #include <bits/stdc++.h>
 using namespace std;
 //// end
-//// ! include_boost
-#include <bits/stdc++.h>
-using namespace std;
-#define int long long
-#define PRIME_SPF_BOOST
-//// end
-
 using ll = long long;
 
 //// expl 符号付き64bit整数の素数判定
@@ -94,19 +88,19 @@ ll rho(ll n) {
     }
 }
 
-#ifdef PRIME_SPF_BOOST
+//// ! spf_boost
 SPF _spf(1000000);
-#endif
+//// end
 
 //// expl 素因数を重複込みでrの末尾に追加する。必要ならsort(r.begin(),r.end())
 void fact(ll n, vector<ll>& r) {
     if (n < 2) return;
-#ifdef PRIME_SPF_BOOST
+    //// ! spf_boost
     if (n <= 1000000) {
         _spf.fact(n, r);
         return;
     }
-#endif
+    //// end
     if (isprime(n)) r.push_back(n);
     else {
         ll d = rho(n);
