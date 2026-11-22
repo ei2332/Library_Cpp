@@ -1,0 +1,580 @@
+<!doctype html>
+<html lang="ja"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Library_Cpp — All</title><style>
+:root{color-scheme:light;--ink:#17212e;--muted:#596675;--rule:#dbe2e9;--shade:#fff2cf}
+*{box-sizing:border-box}html,body{margin:0}
+body{background:#f1f3f6;color:var(--ink);font-family:system-ui,-apple-system,'Yu Gothic',Meiryo,sans-serif}
+#source{display:none!important}
+#screen{max-width:1480px;margin:26px auto 60px;padding:0 20px}
+.screen-layout{display:grid;grid-template-columns:minmax(0,65fr) minmax(310px,35fr);align-items:start;background:white;border:1px solid #dce2e9;border-radius:8px;box-shadow:0 7px 28px #26384d0b}
+.screen-code{min-width:0;padding:24px 27px 38px}
+.screen-notes{position:sticky;top:12px;overflow-y:auto;max-height:calc(100vh - 24px);min-width:0;padding:23px 25px 28px;border-left:1px solid var(--rule)}
+.intro{margin:0 0 16px;padding:0 0 15px;border-bottom:1px solid var(--rule)}
+.intro h1{font-size:24px;line-height:1.25;margin:0 0 7px}
+.intro p{font-size:13px;line-height:1.6;margin:0;color:var(--muted)}
+.code-row{display:grid;grid-template-columns:39px minmax(0,1fr);min-width:0;align-items:start;break-inside:avoid}
+.code-row .num{font:12px/23px 'Liberation Mono',monospace;color:#7d8b99;text-align:right;padding-right:10px;border-right:1px solid var(--rule);user-select:none;font-variant-numeric:tabular-nums}
+.code-row code{display:block;min-width:0;margin-left:13px;white-space:pre-wrap;overflow-wrap:anywhere;tab-size:4;font:14px/23px 'Liberation Mono','DejaVu Sans Mono',monospace;font-variant-ligatures:none}
+.code-row.shaded{background:var(--shade);box-shadow:inset 3px 0 #aa853f}
+.kw{color:#245c88;font-weight:600}.literal{color:#8a4f24}.str{color:#206d51}.comment{color:#648169}
+.note-start{margin:0 0 14px;padding:0 0 11px;border-bottom:1px solid var(--rule)}
+.note-start h2{font-size:15px;margin:0}
+.note{break-inside:avoid;margin:0 0 20px}
+.target{display:grid;grid-template-columns:35px minmax(0,1fr);min-width:0;border-left:3px solid #9db1c5;background:#eef3f8}
+.target .ref{color:#637b90;text-align:center;padding-top:7px;font:11px/20px 'Liberation Mono',monospace;text-decoration:none}
+.target code{display:block;padding:7px 9px 7px 2px;white-space:pre-wrap;overflow-wrap:anywhere;min-width:0;font:12px/20px 'Liberation Mono',monospace}
+.description{padding:7px 0 0 12px}.meta{font-size:12px;line-height:1.6;margin:0 0 4px;overflow-wrap:anywhere}
+.meta.expl{font-weight:600}.meta.comp{color:#43586d}.meta.text{color:#4c5c6c}
+.screen-layout+.screen-layout{margin-top:26px}
+.library-separator{border-top:1px solid var(--rule);margin:0 0 12px}
+#print-pages .library-separator{border-top:.35mm solid #8797a8;margin:2mm 0 2mm}
+#print-pages{position:absolute;left:-10000px;top:0;visibility:hidden}
+.sheet{width:297mm;height:210mm;padding:7mm 7.8mm 5mm;display:flex;flex-direction:column;background:white;overflow:hidden;break-after:page}
+.sheet:last-child{break-after:auto}
+.cols{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:3.5mm;flex:1;min-height:0}
+.col{min-width:0;min-height:0;padding-right:2mm;border-right:.18mm solid #dce1e7;overflow:hidden}
+.col:last-child{padding-right:0;border-right:0}
+.footer{height:5mm;flex:0 0 5mm;color:#6b7784;text-align:right;font:7.5pt/5mm 'Liberation Mono',monospace}
+#print-pages .intro{border-bottom:.2mm solid #9baab8;padding-bottom:2.5mm;margin-bottom:1.5mm}
+#print-pages .intro h1{font-size:11.8pt;margin:0 0 1mm}
+#print-pages .intro p{font-size:8pt;line-height:1.45}
+#print-pages .code-row{grid-template-columns:5mm minmax(0,1fr)}
+#print-pages .code-row .num{font:7pt/1.68 'Liberation Mono',monospace;padding-right:1mm;border-right:.15mm solid var(--rule)}
+#print-pages .code-row code{font:8.5pt/1.38 'Liberation Mono','DejaVu Sans Mono',monospace;margin-left:1.5mm}
+#print-pages .code-row.shaded{background:#fff3d7;box-shadow:inset 1mm 0 #b69b61}
+#print-pages .note-start{border-top:.4mm solid #657789;border-bottom:0;padding:1.9mm 0 2.3mm;margin:0}
+#print-pages .note-start h2{font-size:9pt;line-height:1.35}
+#print-pages .note{margin:0;padding:0 0 2.4mm}
+#print-pages .target{grid-template-columns:5mm minmax(0,1fr);border-left:.5mm solid #8195aa}
+#print-pages .target .ref{font:7pt/1.4 'Liberation Mono',monospace;padding:.8mm 0}
+#print-pages .target code{font:8pt/1.35 'Liberation Mono',monospace;padding:.8mm .8mm .8mm .4mm}
+#print-pages .description{padding:.7mm 0 0;margin-left:5mm}
+#print-pages .meta{font-size:8pt;line-height:1.4;margin:0 0 .55mm}
+@page{size:A4 landscape;margin:0}
+@media screen and (max-width:840px){
+#screen{margin:10px auto;padding:0 8px}.screen-layout{display:block}
+.screen-code{padding:18px 12px}.screen-notes{position:static;max-height:none;border-left:0;border-top:1px solid var(--rule);padding:18px 14px}
+.code-row{grid-template-columns:32px minmax(0,1fr)}.code-row code{margin-left:8px;font-size:12px;line-height:20px}
+}
+@media print{
+html,body{background:white!important}#screen{display:none!important}
+#print-pages{position:static;left:auto;top:auto;visibility:visible}
+.sheet{margin:0;box-shadow:none;print-color-adjust:exact;-webkit-print-color-adjust:exact}
+.kw,.literal,.str,.comment{color:inherit}
+}
+</style></head>
+<body><div id="source" hidden><section class="library-source">
+<header class="intro"><h1>Iset</h1><p>PBDSによる順序統計付き集合。Imapは値を持つ順序統計付き連想配列。</p></header>
+<div class="code-row" data-no="1" id="lib1-line-1"><span class="num">1</span><code style="padding-left:2ch;text-indent:-2ch">#include &lt;ext/pb_ds/assoc_container.hpp&gt;</code></div>
+<div class="code-row" data-no="2" id="lib1-line-2"><span class="num">2</span><code style="padding-left:2ch;text-indent:-2ch">#include &lt;ext/pb_ds/tree_policy.hpp&gt;</code></div>
+<div class="code-row" data-no="3" id="lib1-line-3"><span class="num">3</span><code style="padding-left:2ch;text-indent:-2ch"><span class="kw">using</span> <span class="kw">namespace</span> __gnu_pbds;</code></div>
+<div class="code-row" data-no="4" id="lib1-line-4"><span class="num">4</span><code style="padding-left:2ch;text-indent:-2ch"><span class="kw">template</span> &lt;<span class="kw">typename</span> T, <span class="kw">typename</span> S = null_type&gt;</code></div>
+<div class="code-row" data-no="5" id="lib1-line-5"><span class="num">5</span><code style="padding-left:2ch;text-indent:-2ch"><span class="kw">struct</span> Iset : tree&lt;T, S, less&lt;T&gt;, rb_tree_tag, tree_order_statistics_node_update&gt; {</code></div>
+<div class="code-row" data-no="6" id="lib1-line-6"><span class="num">6</span><code style="padding-left:6ch;text-indent:-2ch"><span class="kw">using</span> base = tree&lt;T, S, less&lt;T&gt;, rb_tree_tag, tree_order_statistics_node_update&gt;;</code></div>
+<div class="code-row" data-no="7" id="lib1-line-7"><span class="num">7</span><code style="padding-left:6ch;text-indent:-2ch"><span class="kw">using</span> base::base;</code></div>
+<div class="code-row" data-no="8" id="lib1-line-8"><span class="num">8</span><code style="padding-left:6ch;text-indent:-2ch"><span class="kw">auto</span> kth(size_t k) { <span class="kw">return</span> this-&gt;find_by_order(k); }</code></div>
+<div class="code-row" data-no="9" id="lib1-line-9"><span class="num">9</span><code style="padding-left:6ch;text-indent:-2ch">size_t rank(<span class="kw">const</span> T&amp; x) { <span class="kw">return</span> this-&gt;order_of_key(x); }</code></div>
+<div class="code-row" data-no="10" id="lib1-line-10"><span class="num">10</span><code style="padding-left:2ch;text-indent:-2ch">};</code></div>
+<div class="code-row" data-no="11" id="lib1-line-11"><span class="num">11</span><code style="padding-left:2ch;text-indent:-2ch"><span class="kw">template</span> &lt;<span class="kw">typename</span> T, <span class="kw">typename</span> S&gt;</code></div>
+<div class="code-row" data-no="12" id="lib1-line-12"><span class="num">12</span><code style="padding-left:2ch;text-indent:-2ch"><span class="kw">using</span> Imap = Iset&lt;T, S&gt;;</code></div>
+<div class="note-start"><h2>説明</h2></div>
+<section class="note"><div class="target"><a class="ref" href="#lib1-line-1">1</a><code>#include &lt;ext/pb_ds/assoc_container.hpp&gt;</code></div><div class="description"><p class="meta text">以下のPBDS用ヘッダーとusing宣言は #define int long long より前に置く</p></div></section>
+<section class="note"><div class="target"><a class="ref" href="#lib1-line-5">5</a><code><span class="kw">struct</span> Iset : tree&lt;T, S, less&lt;T&gt;, rb_tree_tag, tree_order_statistics_node_update&gt; {</code></div><div class="description"><p class="meta text">less&lt;T&gt;をless_equal&lt;T&gt;にするとmultiset,multimapになる</p></div></section>
+<section class="note"><div class="target"><a class="ref" href="#lib1-line-8">8</a><code><span class="kw">auto</span> kth(size_t k) { <span class="kw">return</span> this-&gt;find_by_order(k); }</code></div><div class="description"><p class="meta expl">小さい方からk番目（0-indexed）の要素のイテレータを返す。範囲外ではend()</p><p class="meta comp">計算量 O(log N)</p></div></section>
+<section class="note"><div class="target"><a class="ref" href="#lib1-line-9">9</a><code>size_t rank(<span class="kw">const</span> T&amp; x) { <span class="kw">return</span> this-&gt;order_of_key(x); }</code></div><div class="description"><p class="meta expl">x未満のキーの個数を返す</p><p class="meta comp">計算量 O(log N)</p></div></section>
+<section class="note"><div class="target"><a class="ref" href="#lib1-line-11">11</a><code><span class="kw">template</span> &lt;<span class="kw">typename</span> T, <span class="kw">typename</span> S&gt;</code></div><div class="description"><p class="meta expl">値を持つ順序統計付き連想配列</p></div></section>
+</section>
+<section class="library-source">
+<header class="intro"><h1>ModInt</h1><p>固定法の剰余整数、CRT、組合せ計算</p></header>
+<div class="code-row" data-no="1" id="lib2-line-1"><span class="num">1</span><code style="padding-left:2ch;text-indent:-2ch"><span class="kw">using</span> ll = <span class="kw">long</span> <span class="kw">long</span>;</code></div>
+<div class="code-row" data-no="2" id="lib2-line-2"><span class="num">2</span><code style="padding-left:2ch;text-indent:-2ch"></code></div>
+<div class="code-row" data-no="3" id="lib2-line-3"><span class="num">3</span><code style="padding-left:2ch;text-indent:-2ch"><span class="kw">template</span> &lt;<span class="kw">int</span> MOD&gt;</code></div>
+<div class="code-row" data-no="4" id="lib2-line-4"><span class="num">4</span><code style="padding-left:2ch;text-indent:-2ch"><span class="kw">struct</span> mint {</code></div>
+<div class="code-row" data-no="5" id="lib2-line-5"><span class="num">5</span><code style="padding-left:6ch;text-indent:-2ch"><span class="kw">int</span> v;</code></div>
+<div class="code-row" data-no="6" id="lib2-line-6"><span class="num">6</span><code style="padding-left:6ch;text-indent:-2ch">mint(ll x = <span class="literal">0</span>) {</code></div>
+<div class="code-row" data-no="7" id="lib2-line-7"><span class="num">7</span><code style="padding-left:10ch;text-indent:-2ch">x %= MOD;</code></div>
+<div class="code-row" data-no="8" id="lib2-line-8"><span class="num">8</span><code style="padding-left:10ch;text-indent:-2ch"><span class="kw">if</span> (x &lt; <span class="literal">0</span>) x += MOD;</code></div>
+<div class="code-row" data-no="9" id="lib2-line-9"><span class="num">9</span><code style="padding-left:10ch;text-indent:-2ch">v = x;</code></div>
+<div class="code-row" data-no="10" id="lib2-line-10"><span class="num">10</span><code style="padding-left:6ch;text-indent:-2ch">}</code></div>
+<div class="code-row" data-no="11" id="lib2-line-11"><span class="num">11</span><code style="padding-left:6ch;text-indent:-2ch">mint&amp; <span class="kw">operator</span>+=(<span class="kw">const</span> mint&amp; o) {</code></div>
+<div class="code-row" data-no="12" id="lib2-line-12"><span class="num">12</span><code style="padding-left:10ch;text-indent:-2ch">v += o.v;</code></div>
+<div class="code-row" data-no="13" id="lib2-line-13"><span class="num">13</span><code style="padding-left:10ch;text-indent:-2ch"><span class="kw">if</span> (v &gt;= MOD) v -= MOD;</code></div>
+<div class="code-row" data-no="14" id="lib2-line-14"><span class="num">14</span><code style="padding-left:10ch;text-indent:-2ch"><span class="kw">return</span> *this;</code></div>
+<div class="code-row" data-no="15" id="lib2-line-15"><span class="num">15</span><code style="padding-left:6ch;text-indent:-2ch">}</code></div>
+<div class="code-row" data-no="16" id="lib2-line-16"><span class="num">16</span><code style="padding-left:6ch;text-indent:-2ch">mint&amp; <span class="kw">operator</span>-=(<span class="kw">const</span> mint&amp; o) {</code></div>
+<div class="code-row" data-no="17" id="lib2-line-17"><span class="num">17</span><code style="padding-left:10ch;text-indent:-2ch">v -= o.v;</code></div>
+<div class="code-row" data-no="18" id="lib2-line-18"><span class="num">18</span><code style="padding-left:10ch;text-indent:-2ch"><span class="kw">if</span> (v &lt; <span class="literal">0</span>) v += MOD;</code></div>
+<div class="code-row" data-no="19" id="lib2-line-19"><span class="num">19</span><code style="padding-left:10ch;text-indent:-2ch"><span class="kw">return</span> *this;</code></div>
+<div class="code-row" data-no="20" id="lib2-line-20"><span class="num">20</span><code style="padding-left:6ch;text-indent:-2ch">}</code></div>
+<div class="code-row" data-no="21" id="lib2-line-21"><span class="num">21</span><code style="padding-left:6ch;text-indent:-2ch">mint&amp; <span class="kw">operator</span>*=(<span class="kw">const</span> mint&amp; o) {</code></div>
+<div class="code-row" data-no="22" id="lib2-line-22"><span class="num">22</span><code style="padding-left:10ch;text-indent:-2ch">v = ll(v) * o.v % MOD;</code></div>
+<div class="code-row" data-no="23" id="lib2-line-23"><span class="num">23</span><code style="padding-left:10ch;text-indent:-2ch"><span class="kw">return</span> *this;</code></div>
+<div class="code-row" data-no="24" id="lib2-line-24"><span class="num">24</span><code style="padding-left:6ch;text-indent:-2ch">}</code></div>
+<div class="code-row" data-no="25" id="lib2-line-25"><span class="num">25</span><code style="padding-left:6ch;text-indent:-2ch">mint&amp; <span class="kw">operator</span>/=(<span class="kw">const</span> mint&amp; o) {</code></div>
+<div class="code-row" data-no="26" id="lib2-line-26"><span class="num">26</span><code style="padding-left:10ch;text-indent:-2ch"><span class="kw">auto</span> [g, x] = o.inv_gcd();</code></div>
+<div class="code-row" data-no="27" id="lib2-line-27"><span class="num">27</span><code style="padding-left:10ch;text-indent:-2ch">assert(g == <span class="literal">1</span>);</code></div>
+<div class="code-row" data-no="28" id="lib2-line-28"><span class="num">28</span><code style="padding-left:10ch;text-indent:-2ch"><span class="kw">return</span> *this *= x;</code></div>
+<div class="code-row" data-no="29" id="lib2-line-29"><span class="num">29</span><code style="padding-left:6ch;text-indent:-2ch">}</code></div>
+<div class="code-row" data-no="30" id="lib2-line-30"><span class="num">30</span><code style="padding-left:6ch;text-indent:-2ch"><span class="kw">friend</span> mint <span class="kw">operator</span>+(mint a, <span class="kw">const</span> mint&amp; b) { <span class="kw">return</span> a += b; }</code></div>
+<div class="code-row" data-no="31" id="lib2-line-31"><span class="num">31</span><code style="padding-left:6ch;text-indent:-2ch"><span class="kw">friend</span> mint <span class="kw">operator</span>-(mint a, <span class="kw">const</span> mint&amp; b) { <span class="kw">return</span> a -= b; }</code></div>
+<div class="code-row" data-no="32" id="lib2-line-32"><span class="num">32</span><code style="padding-left:6ch;text-indent:-2ch"><span class="kw">friend</span> mint <span class="kw">operator</span>*(mint a, <span class="kw">const</span> mint&amp; b) { <span class="kw">return</span> a *= b; }</code></div>
+<div class="code-row" data-no="33" id="lib2-line-33"><span class="num">33</span><code style="padding-left:6ch;text-indent:-2ch"><span class="kw">friend</span> mint <span class="kw">operator</span>/(mint a, <span class="kw">const</span> mint&amp; b) { <span class="kw">return</span> a /= b; }</code></div>
+<div class="code-row" data-no="34" id="lib2-line-34"><span class="num">34</span><code style="padding-left:6ch;text-indent:-2ch"><span class="kw">bool</span> <span class="kw">operator</span>==(<span class="kw">const</span> mint&amp;) <span class="kw">const</span> = default;</code></div>
+<div class="code-row" data-no="35" id="lib2-line-35"><span class="num">35</span><code style="padding-left:6ch;text-indent:-2ch">mint pow(ll n) <span class="kw">const</span> {</code></div>
+<div class="code-row" data-no="36" id="lib2-line-36"><span class="num">36</span><code style="padding-left:10ch;text-indent:-2ch">mint x = *this, r = <span class="literal">1</span>;</code></div>
+<div class="code-row" data-no="37" id="lib2-line-37"><span class="num">37</span><code style="padding-left:10ch;text-indent:-2ch"><span class="kw">while</span> (n) {</code></div>
+<div class="code-row" data-no="38" id="lib2-line-38"><span class="num">38</span><code style="padding-left:14ch;text-indent:-2ch"><span class="kw">if</span> (n &amp; <span class="literal">1</span>) r *= x;</code></div>
+<div class="code-row" data-no="39" id="lib2-line-39"><span class="num">39</span><code style="padding-left:14ch;text-indent:-2ch">x *= x;</code></div>
+<div class="code-row" data-no="40" id="lib2-line-40"><span class="num">40</span><code style="padding-left:14ch;text-indent:-2ch">n &gt;&gt;= <span class="literal">1</span>;</code></div>
+<div class="code-row" data-no="41" id="lib2-line-41"><span class="num">41</span><code style="padding-left:10ch;text-indent:-2ch">}</code></div>
+<div class="code-row" data-no="42" id="lib2-line-42"><span class="num">42</span><code style="padding-left:10ch;text-indent:-2ch"><span class="kw">return</span> r;</code></div>
+<div class="code-row" data-no="43" id="lib2-line-43"><span class="num">43</span><code style="padding-left:6ch;text-indent:-2ch">}</code></div>
+<div class="code-row" data-no="44" id="lib2-line-44"><span class="num">44</span><code style="padding-left:6ch;text-indent:-2ch">pair&lt;<span class="kw">int</span>, <span class="kw">int</span>&gt; inv_gcd() <span class="kw">const</span> {</code></div>
+<div class="code-row" data-no="45" id="lib2-line-45"><span class="num">45</span><code style="padding-left:10ch;text-indent:-2ch">ll a = MOD, b = v, x = <span class="literal">0</span>, y = <span class="literal">1</span>, q;</code></div>
+<div class="code-row" data-no="46" id="lib2-line-46"><span class="num">46</span><code style="padding-left:10ch;text-indent:-2ch"><span class="kw">while</span> (b) {</code></div>
+<div class="code-row" data-no="47" id="lib2-line-47"><span class="num">47</span><code style="padding-left:14ch;text-indent:-2ch">q = a / b;</code></div>
+<div class="code-row" data-no="48" id="lib2-line-48"><span class="num">48</span><code style="padding-left:14ch;text-indent:-2ch">swap(a -= q * b, b);</code></div>
+<div class="code-row" data-no="49" id="lib2-line-49"><span class="num">49</span><code style="padding-left:14ch;text-indent:-2ch">swap(x -= q * y, y);</code></div>
+<div class="code-row" data-no="50" id="lib2-line-50"><span class="num">50</span><code style="padding-left:10ch;text-indent:-2ch">}</code></div>
+<div class="code-row" data-no="51" id="lib2-line-51"><span class="num">51</span><code style="padding-left:10ch;text-indent:-2ch"><span class="kw">if</span> (x &lt; <span class="literal">0</span>) x += MOD / a;</code></div>
+<div class="code-row" data-no="52" id="lib2-line-52"><span class="num">52</span><code style="padding-left:10ch;text-indent:-2ch"><span class="kw">return</span> {a, x};</code></div>
+<div class="code-row" data-no="53" id="lib2-line-53"><span class="num">53</span><code style="padding-left:6ch;text-indent:-2ch">}</code></div>
+<div class="code-row" data-no="54" id="lib2-line-54"><span class="num">54</span><code style="padding-left:2ch;text-indent:-2ch">};</code></div>
+<div class="code-row" data-no="55" id="lib2-line-55"><span class="num">55</span><code style="padding-left:2ch;text-indent:-2ch"><span class="kw">template</span> &lt;<span class="kw">int</span> P, <span class="kw">int</span> Q&gt;</code></div>
+<div class="code-row" data-no="56" id="lib2-line-56"><span class="num">56</span><code style="padding-left:2ch;text-indent:-2ch">ll crt(mint&lt;P&gt; x, mint&lt;Q&gt; y) {</code></div>
+<div class="code-row" data-no="57" id="lib2-line-57"><span class="num">57</span><code style="padding-left:6ch;text-indent:-2ch"><span class="kw">auto</span> [g, inv] = mint&lt;P&gt;(Q).inv_gcd();</code></div>
+<div class="code-row" data-no="58" id="lib2-line-58"><span class="num">58</span><code style="padding-left:6ch;text-indent:-2ch"><span class="kw">int</span> d = x.v - y.v, p = P / g;</code></div>
+<div class="code-row" data-no="59" id="lib2-line-59"><span class="num">59</span><code style="padding-left:6ch;text-indent:-2ch"><span class="kw">if</span> (d % g) <span class="kw">return</span> -<span class="literal">1</span>;</code></div>
+<div class="code-row" data-no="60" id="lib2-line-60"><span class="num">60</span><code style="padding-left:6ch;text-indent:-2ch"><span class="kw">int</span> t = d / g % p;</code></div>
+<div class="code-row" data-no="61" id="lib2-line-61"><span class="num">61</span><code style="padding-left:6ch;text-indent:-2ch"><span class="kw">if</span> (t &lt; <span class="literal">0</span>) t += p;</code></div>
+<div class="code-row" data-no="62" id="lib2-line-62"><span class="num">62</span><code style="padding-left:6ch;text-indent:-2ch"><span class="kw">return</span> y.v + ll(t) * inv % p * Q;</code></div>
+<div class="code-row" data-no="63" id="lib2-line-63"><span class="num">63</span><code style="padding-left:2ch;text-indent:-2ch">}</code></div>
+<div class="code-row" data-no="64" id="lib2-line-64"><span class="num">64</span><code style="padding-left:2ch;text-indent:-2ch"><span class="kw">struct</span> Comb {</code></div>
+<div class="code-row" data-no="65" id="lib2-line-65"><span class="num">65</span><code style="padding-left:6ch;text-indent:-2ch"><span class="kw">using</span> T = mint&lt;<span class="literal">998244353</span>&gt;;</code></div>
+<div class="code-row" data-no="66" id="lib2-line-66"><span class="num">66</span><code style="padding-left:6ch;text-indent:-2ch">vector&lt;T&gt; fact, ifact;</code></div>
+<div class="code-row" data-no="67" id="lib2-line-67"><span class="num">67</span><code style="padding-left:6ch;text-indent:-2ch">Comb(<span class="kw">int</span> n) : fact(n + <span class="literal">1</span>), ifact(n + <span class="literal">1</span>) {</code></div>
+<div class="code-row" data-no="68" id="lib2-line-68"><span class="num">68</span><code style="padding-left:10ch;text-indent:-2ch">fact[<span class="literal">0</span>] = <span class="literal">1</span>;</code></div>
+<div class="code-row" data-no="69" id="lib2-line-69"><span class="num">69</span><code style="padding-left:10ch;text-indent:-2ch"><span class="kw">for</span> (<span class="kw">int</span> i = <span class="literal">1</span>; i &lt;= n; i++) fact[i] = fact[i - <span class="literal">1</span>] * i;</code></div>
+<div class="code-row" data-no="70" id="lib2-line-70"><span class="num">70</span><code style="padding-left:10ch;text-indent:-2ch">ifact[n] = fact[n].inv_gcd().second;</code></div>
+<div class="code-row" data-no="71" id="lib2-line-71"><span class="num">71</span><code style="padding-left:10ch;text-indent:-2ch"><span class="kw">for</span> (<span class="kw">int</span> i = n; i &gt; <span class="literal">0</span>; i--) ifact[i - <span class="literal">1</span>] = ifact[i] * i;</code></div>
+<div class="code-row" data-no="72" id="lib2-line-72"><span class="num">72</span><code style="padding-left:6ch;text-indent:-2ch">}</code></div>
+<div class="code-row" data-no="73" id="lib2-line-73"><span class="num">73</span><code style="padding-left:6ch;text-indent:-2ch">T C(<span class="kw">int</span> n, <span class="kw">int</span> r) <span class="kw">const</span> {</code></div>
+<div class="code-row" data-no="74" id="lib2-line-74"><span class="num">74</span><code style="padding-left:10ch;text-indent:-2ch"><span class="kw">if</span> (n &lt; <span class="literal">0</span> || r &lt; <span class="literal">0</span> || r &gt; n) <span class="kw">return</span> <span class="literal">0</span>;</code></div>
+<div class="code-row" data-no="75" id="lib2-line-75"><span class="num">75</span><code style="padding-left:10ch;text-indent:-2ch"><span class="kw">return</span> fact[n] * ifact[r] * ifact[n - r];</code></div>
+<div class="code-row" data-no="76" id="lib2-line-76"><span class="num">76</span><code style="padding-left:6ch;text-indent:-2ch">}</code></div>
+<div class="code-row" data-no="77" id="lib2-line-77"><span class="num">77</span><code style="padding-left:6ch;text-indent:-2ch">T P(<span class="kw">int</span> n, <span class="kw">int</span> r) <span class="kw">const</span> {</code></div>
+<div class="code-row" data-no="78" id="lib2-line-78"><span class="num">78</span><code style="padding-left:10ch;text-indent:-2ch"><span class="kw">if</span> (n &lt; <span class="literal">0</span> || r &lt; <span class="literal">0</span> || r &gt; n) <span class="kw">return</span> <span class="literal">0</span>;</code></div>
+<div class="code-row" data-no="79" id="lib2-line-79"><span class="num">79</span><code style="padding-left:10ch;text-indent:-2ch"><span class="kw">return</span> fact[n] * ifact[n - r];</code></div>
+<div class="code-row" data-no="80" id="lib2-line-80"><span class="num">80</span><code style="padding-left:6ch;text-indent:-2ch">}</code></div>
+<div class="code-row" data-no="81" id="lib2-line-81"><span class="num">81</span><code style="padding-left:6ch;text-indent:-2ch">T H(<span class="kw">int</span> n, <span class="kw">int</span> r) <span class="kw">const</span> {</code></div>
+<div class="code-row" data-no="82" id="lib2-line-82"><span class="num">82</span><code style="padding-left:10ch;text-indent:-2ch"><span class="kw">if</span> (n &lt;= <span class="literal">0</span> || r &lt; <span class="literal">0</span>) <span class="kw">return</span> (n | r) == <span class="literal">0</span>;</code></div>
+<div class="code-row" data-no="83" id="lib2-line-83"><span class="num">83</span><code style="padding-left:10ch;text-indent:-2ch"><span class="kw">return</span> C(n + r - <span class="literal">1</span>, r);</code></div>
+<div class="code-row" data-no="84" id="lib2-line-84"><span class="num">84</span><code style="padding-left:6ch;text-indent:-2ch">}</code></div>
+<div class="code-row" data-no="85" id="lib2-line-85"><span class="num">85</span><code style="padding-left:2ch;text-indent:-2ch">};</code></div>
+<div class="note-start"><h2>説明</h2></div>
+<section class="note"><div class="target"><a class="ref" href="#lib2-line-35">35</a><code>mint pow(ll n) <span class="kw">const</span> {</code></div><div class="description"><p class="meta expl">n乗を返す</p><p class="meta comp">計算量 O(log n)</p></div></section>
+<section class="note"><div class="target"><a class="ref" href="#lib2-line-44">44</a><code>pair&lt;<span class="kw">int</span>, <span class="kw">int</span>&gt; inv_gcd() <span class="kw">const</span> {</code></div><div class="description"><p class="meta expl">(g,x)を返す。v*x ≡ g (mod MOD)、g = gcd(v,MOD)</p><p class="meta comp">計算量 O(log MOD)</p></div></section>
+<section class="note"><div class="target"><a class="ref" href="#lib2-line-55">55</a><code><span class="kw">template</span> &lt;<span class="kw">int</span> P, <span class="kw">int</span> Q&gt;</code></div><div class="description"><p class="meta expl">a ≡ x (mod P), a ≡ y (mod Q) を統合する</p><p class="meta text">解なしなら-1。結果は[0,lcm(P,Q))に正規化</p><p class="meta comp">計算量 O(log min(P,Q))</p></div></section>
+<section class="note"><div class="target"><a class="ref" href="#lib2-line-64">64</a><code><span class="kw">struct</span> Comb {</code></div><div class="description"><p class="meta text">階乗が可逆である範囲を前計算する</p><p class="meta text">素数MODの場合、前計算上限N &lt; MOD</p></div></section>
+<section class="note"><div class="target"><a class="ref" href="#lib2-line-67">67</a><code>Comb(<span class="kw">int</span> n) : fact(n + <span class="literal">1</span>), ifact(n + <span class="literal">1</span>) {</code></div><div class="description"><p class="meta comp">計算量 O(N + log MOD)</p></div></section>
+<section class="note"><div class="target"><a class="ref" href="#lib2-line-73">73</a><code>T C(<span class="kw">int</span> n, <span class="kw">int</span> r) <span class="kw">const</span> {</code></div><div class="description"><p class="meta expl">組合せ nCr</p><p class="meta comp">計算量 O(1)</p></div></section>
+<section class="note"><div class="target"><a class="ref" href="#lib2-line-77">77</a><code>T P(<span class="kw">int</span> n, <span class="kw">int</span> r) <span class="kw">const</span> {</code></div><div class="description"><p class="meta expl">順列 nPr</p><p class="meta comp">計算量 O(1)</p></div></section>
+<section class="note"><div class="target"><a class="ref" href="#lib2-line-81">81</a><code>T H(<span class="kw">int</span> n, <span class="kw">int</span> r) <span class="kw">const</span> {</code></div><div class="description"><p class="meta expl">重複組合せ nHr</p><p class="meta comp">計算量 O(1)</p></div></section>
+</section>
+<section class="library-source">
+<header class="intro"><h1>SCC</h1><p>強連結成分分解（Kosaraju法）</p></header>
+<div class="code-row" data-no="1" id="lib3-line-1"><span class="num">1</span><code style="padding-left:2ch;text-indent:-2ch"><span class="kw">struct</span> SCC {</code></div>
+<div class="code-row" data-no="2" id="lib3-line-2"><span class="num">2</span><code style="padding-left:6ch;text-indent:-2ch">vector&lt;vector&lt;<span class="kw">int</span>&gt;&gt; g, rg;</code></div>
+<div class="code-row" data-no="3" id="lib3-line-3"><span class="num">3</span><code style="padding-left:6ch;text-indent:-2ch">vector&lt;<span class="kw">int</span>&gt; id, order;</code></div>
+<div class="code-row" data-no="4" id="lib3-line-4"><span class="num">4</span><code style="padding-left:2ch;text-indent:-2ch"></code></div>
+<div class="code-row" data-no="5" id="lib3-line-5"><span class="num">5</span><code style="padding-left:6ch;text-indent:-2ch">SCC(<span class="kw">int</span> n) : g(n), rg(n), id(n) {}</code></div>
+<div class="code-row" data-no="6" id="lib3-line-6"><span class="num">6</span><code style="padding-left:2ch;text-indent:-2ch"></code></div>
+<div class="code-row" data-no="7" id="lib3-line-7"><span class="num">7</span><code style="padding-left:6ch;text-indent:-2ch"><span class="kw">void</span> add_edge(<span class="kw">int</span> u, <span class="kw">int</span> v) {</code></div>
+<div class="code-row" data-no="8" id="lib3-line-8"><span class="num">8</span><code style="padding-left:10ch;text-indent:-2ch">g[u].push_back(v);</code></div>
+<div class="code-row" data-no="9" id="lib3-line-9"><span class="num">9</span><code style="padding-left:10ch;text-indent:-2ch">rg[v].push_back(u);</code></div>
+<div class="code-row" data-no="10" id="lib3-line-10"><span class="num">10</span><code style="padding-left:6ch;text-indent:-2ch">}</code></div>
+<div class="code-row" data-no="11" id="lib3-line-11"><span class="num">11</span><code style="padding-left:2ch;text-indent:-2ch"></code></div>
+<div class="code-row" data-no="12" id="lib3-line-12"><span class="num">12</span><code style="padding-left:6ch;text-indent:-2ch"><span class="kw">void</span> dfs1(<span class="kw">int</span> v) {</code></div>
+<div class="code-row" data-no="13" id="lib3-line-13"><span class="num">13</span><code style="padding-left:10ch;text-indent:-2ch">id[v] = -<span class="literal">1</span>;</code></div>
+<div class="code-row" data-no="14" id="lib3-line-14"><span class="num">14</span><code style="padding-left:10ch;text-indent:-2ch"><span class="kw">for</span> (<span class="kw">int</span> u : g[v]) <span class="kw">if</span> (id[u] == <span class="literal">0</span>) dfs1(u);</code></div>
+<div class="code-row" data-no="15" id="lib3-line-15"><span class="num">15</span><code style="padding-left:10ch;text-indent:-2ch">order.push_back(v);</code></div>
+<div class="code-row" data-no="16" id="lib3-line-16"><span class="num">16</span><code style="padding-left:6ch;text-indent:-2ch">}</code></div>
+<div class="code-row" data-no="17" id="lib3-line-17"><span class="num">17</span><code style="padding-left:2ch;text-indent:-2ch"></code></div>
+<div class="code-row" data-no="18" id="lib3-line-18"><span class="num">18</span><code style="padding-left:6ch;text-indent:-2ch"><span class="kw">void</span> dfs2(<span class="kw">int</span> v, <span class="kw">int</span> k) {</code></div>
+<div class="code-row" data-no="19" id="lib3-line-19"><span class="num">19</span><code style="padding-left:10ch;text-indent:-2ch">id[v] = k;</code></div>
+<div class="code-row" data-no="20" id="lib3-line-20"><span class="num">20</span><code style="padding-left:10ch;text-indent:-2ch"><span class="kw">for</span> (<span class="kw">int</span> u : rg[v]) <span class="kw">if</span> (id[u] == -<span class="literal">1</span>) dfs2(u, k);</code></div>
+<div class="code-row" data-no="21" id="lib3-line-21"><span class="num">21</span><code style="padding-left:6ch;text-indent:-2ch">}</code></div>
+<div class="code-row" data-no="22" id="lib3-line-22"><span class="num">22</span><code style="padding-left:6ch;text-indent:-2ch"><span class="kw">int</span> build() {</code></div>
+<div class="code-row" data-no="23" id="lib3-line-23"><span class="num">23</span><code style="padding-left:10ch;text-indent:-2ch"><span class="kw">int</span> n = g.size();</code></div>
+<div class="code-row" data-no="24" id="lib3-line-24"><span class="num">24</span><code style="padding-left:10ch;text-indent:-2ch">id.assign(n, <span class="literal">0</span>);</code></div>
+<div class="code-row" data-no="25" id="lib3-line-25"><span class="num">25</span><code style="padding-left:10ch;text-indent:-2ch">order.clear();</code></div>
+<div class="code-row" data-no="26" id="lib3-line-26"><span class="num">26</span><code style="padding-left:10ch;text-indent:-2ch"><span class="kw">for</span> (<span class="kw">int</span> v = <span class="literal">0</span>; v &lt; n; v++) <span class="kw">if</span> (id[v] == <span class="literal">0</span>) dfs1(v);</code></div>
+<div class="code-row" data-no="27" id="lib3-line-27"><span class="num">27</span><code style="padding-left:10ch;text-indent:-2ch"><span class="kw">int</span> k = <span class="literal">0</span>;</code></div>
+<div class="code-row" data-no="28" id="lib3-line-28"><span class="num">28</span><code style="padding-left:10ch;text-indent:-2ch"><span class="kw">for</span> (<span class="kw">int</span> i = n - <span class="literal">1</span>; i &gt;= <span class="literal">0</span>; i--) {</code></div>
+<div class="code-row" data-no="29" id="lib3-line-29"><span class="num">29</span><code style="padding-left:14ch;text-indent:-2ch"><span class="kw">int</span> v = order[i];</code></div>
+<div class="code-row" data-no="30" id="lib3-line-30"><span class="num">30</span><code style="padding-left:14ch;text-indent:-2ch"><span class="kw">if</span> (id[v] == -<span class="literal">1</span>) dfs2(v, k++);</code></div>
+<div class="code-row" data-no="31" id="lib3-line-31"><span class="num">31</span><code style="padding-left:10ch;text-indent:-2ch">}</code></div>
+<div class="code-row" data-no="32" id="lib3-line-32"><span class="num">32</span><code style="padding-left:10ch;text-indent:-2ch"><span class="kw">return</span> k;</code></div>
+<div class="code-row" data-no="33" id="lib3-line-33"><span class="num">33</span><code style="padding-left:6ch;text-indent:-2ch">}</code></div>
+<div class="code-row" data-no="34" id="lib3-line-34"><span class="num">34</span><code style="padding-left:2ch;text-indent:-2ch">};</code></div>
+<div class="note-start"><h2>説明</h2></div>
+<section class="note"><div class="target"><a class="ref" href="#lib3-line-22">22</a><code><span class="kw">int</span> build() {</code></div><div class="description"><p class="meta expl">成分数を返す。idはトポロジカル順に付与</p><p class="meta comp">計算量 O(N+M)</p></div></section>
+</section>
+<section class="library-source">
+<header class="intro"><h1>SegTree</h1><p>モノイドによる区間集約と点更新を行うセグメント木。lazyスコープでは区間更新にも対応する。</p></header>
+<div class="code-row" data-no="1" id="lib4-line-1"><span class="num">1</span><code style="padding-left:2ch;text-indent:-2ch"><span class="kw">template</span> &lt;<span class="kw">class</span> T = <span class="kw">int</span>&gt;</code></div>
+<div class="code-row" data-no="2" id="lib4-line-2"><span class="num">2</span><code style="padding-left:2ch;text-indent:-2ch"><span class="kw">struct</span> SegTree {</code></div>
+<div class="code-row" data-no="3" id="lib4-line-3"><span class="num">3</span><code style="padding-left:6ch;text-indent:-2ch">T f1(T x, T y) { <span class="kw">return</span> x + y; }</code></div>
+<div class="code-row" data-no="4" id="lib4-line-4"><span class="num">4</span><code style="padding-left:6ch;text-indent:-2ch">T e = <span class="literal">0</span>;</code></div>
+<div class="code-row shaded" data-no="5" id="lib4-line-5"><span class="num">5</span><code style="padding-left:6ch;text-indent:-2ch"><span class="kw">using</span> S = pair&lt;T, T&gt;;</code></div>
+<div class="code-row shaded" data-no="6" id="lib4-line-6"><span class="num">6</span><code style="padding-left:6ch;text-indent:-2ch">T f2(T x, S f, <span class="kw">int</span> len) { <span class="kw">return</span> f.first * x + f.second * len; }</code></div>
+<div class="code-row shaded" data-no="7" id="lib4-line-7"><span class="num">7</span><code style="padding-left:6ch;text-indent:-2ch">S f3(S o, S n) { <span class="kw">return</span> {o.first * n.first, n.first * o.second + n.second}; }</code></div>
+<div class="code-row shaded" data-no="8" id="lib4-line-8"><span class="num">8</span><code style="padding-left:6ch;text-indent:-2ch">S le = {<span class="literal">1</span>, <span class="literal">0</span>};</code></div>
+<div class="code-row" data-no="9" id="lib4-line-9"><span class="num">9</span><code style="padding-left:2ch;text-indent:-2ch"></code></div>
+<div class="code-row" data-no="10" id="lib4-line-10"><span class="num">10</span><code style="padding-left:6ch;text-indent:-2ch">vector&lt;T&gt; d;</code></div>
+<div class="code-row shaded" data-no="11" id="lib4-line-11"><span class="num">11</span><code style="padding-left:6ch;text-indent:-2ch">vector&lt;S&gt; lz;</code></div>
+<div class="code-row" data-no="12" id="lib4-line-12"><span class="num">12</span><code style="padding-left:6ch;text-indent:-2ch"><span class="kw">int</span> sz = <span class="literal">1</span>, log = <span class="literal">0</span>;</code></div>
+<div class="code-row" data-no="13" id="lib4-line-13"><span class="num">13</span><code style="padding-left:6ch;text-indent:-2ch">SegTree(<span class="kw">int</span> n) {</code></div>
+<div class="code-row" data-no="14" id="lib4-line-14"><span class="num">14</span><code style="padding-left:10ch;text-indent:-2ch"><span class="kw">while</span> (sz &lt; n) sz *= <span class="literal">2</span>, log++;</code></div>
+<div class="code-row" data-no="15" id="lib4-line-15"><span class="num">15</span><code style="padding-left:10ch;text-indent:-2ch">d.assign(<span class="literal">2</span> * sz, e);</code></div>
+<div class="code-row shaded" data-no="16" id="lib4-line-16"><span class="num">16</span><code style="padding-left:10ch;text-indent:-2ch">lz.assign(sz, le);</code></div>
+<div class="code-row" data-no="17" id="lib4-line-17"><span class="num">17</span><code style="padding-left:6ch;text-indent:-2ch">}</code></div>
+<div class="code-row shaded" data-no="18" id="lib4-line-18"><span class="num">18</span><code style="padding-left:6ch;text-indent:-2ch"><span class="kw">void</span> push(<span class="kw">int</span> k, <span class="kw">int</span> len) {</code></div>
+<div class="code-row shaded" data-no="19" id="lib4-line-19"><span class="num">19</span><code style="padding-left:10ch;text-indent:-2ch"><span class="kw">if</span> (lz[k] == le) <span class="kw">return</span>;</code></div>
+<div class="code-row shaded" data-no="20" id="lib4-line-20"><span class="num">20</span><code style="padding-left:10ch;text-indent:-2ch"><span class="kw">int</span> l = k * <span class="literal">2</span>, r = l + <span class="literal">1</span>;</code></div>
+<div class="code-row shaded" data-no="21" id="lib4-line-21"><span class="num">21</span><code style="padding-left:10ch;text-indent:-2ch">d[l] = f2(d[l], lz[k], len / <span class="literal">2</span>);</code></div>
+<div class="code-row shaded" data-no="22" id="lib4-line-22"><span class="num">22</span><code style="padding-left:10ch;text-indent:-2ch">d[r] = f2(d[r], lz[k], len / <span class="literal">2</span>);</code></div>
+<div class="code-row shaded" data-no="23" id="lib4-line-23"><span class="num">23</span><code style="padding-left:10ch;text-indent:-2ch"><span class="kw">if</span> (l &lt; sz) {</code></div>
+<div class="code-row shaded" data-no="24" id="lib4-line-24"><span class="num">24</span><code style="padding-left:14ch;text-indent:-2ch">lz[l] = f3(lz[l], lz[k]);</code></div>
+<div class="code-row shaded" data-no="25" id="lib4-line-25"><span class="num">25</span><code style="padding-left:14ch;text-indent:-2ch">lz[r] = f3(lz[r], lz[k]);</code></div>
+<div class="code-row shaded" data-no="26" id="lib4-line-26"><span class="num">26</span><code style="padding-left:10ch;text-indent:-2ch">}</code></div>
+<div class="code-row shaded" data-no="27" id="lib4-line-27"><span class="num">27</span><code style="padding-left:10ch;text-indent:-2ch">lz[k] = le;</code></div>
+<div class="code-row shaded" data-no="28" id="lib4-line-28"><span class="num">28</span><code style="padding-left:6ch;text-indent:-2ch">}</code></div>
+<div class="code-row" data-no="29" id="lib4-line-29"><span class="num">29</span><code style="padding-left:6ch;text-indent:-2ch"><span class="kw">void</span> set(<span class="kw">int</span> i, T x) {</code></div>
+<div class="code-row" data-no="30" id="lib4-line-30"><span class="num">30</span><code style="padding-left:10ch;text-indent:-2ch"><span class="kw">int</span> k = i + sz;</code></div>
+<div class="code-row shaded" data-no="31" id="lib4-line-31"><span class="num">31</span><code style="padding-left:10ch;text-indent:-2ch"><span class="kw">for</span> (<span class="kw">int</span> h = log; h &gt; <span class="literal">0</span>; h--) push(k &gt;&gt; h, <span class="literal">1LL</span> &lt;&lt; h);</code></div>
+<div class="code-row" data-no="32" id="lib4-line-32"><span class="num">32</span><code style="padding-left:10ch;text-indent:-2ch">d[k] = x;</code></div>
+<div class="code-row" data-no="33" id="lib4-line-33"><span class="num">33</span><code style="padding-left:10ch;text-indent:-2ch"><span class="kw">while</span> (k &gt;&gt;= <span class="literal">1</span>) d[k] = f1(d[k * <span class="literal">2</span>], d[k * <span class="literal">2</span> + <span class="literal">1</span>]);</code></div>
+<div class="code-row" data-no="34" id="lib4-line-34"><span class="num">34</span><code style="padding-left:6ch;text-indent:-2ch">}</code></div>
+<div class="code-row" data-no="35" id="lib4-line-35"><span class="num">35</span><code style="padding-left:6ch;text-indent:-2ch">T query(<span class="kw">int</span> l, <span class="kw">int</span> r, <span class="kw">int</span> k = <span class="literal">1</span>, <span class="kw">int</span> a = <span class="literal">0</span>, <span class="kw">int</span> b = -<span class="literal">1</span>) {</code></div>
+<div class="code-row" data-no="36" id="lib4-line-36"><span class="num">36</span><code style="padding-left:10ch;text-indent:-2ch"><span class="kw">if</span> (b &lt; <span class="literal">0</span>) b = sz;</code></div>
+<div class="code-row" data-no="37" id="lib4-line-37"><span class="num">37</span><code style="padding-left:10ch;text-indent:-2ch"><span class="kw">if</span> (r &lt;= a || b &lt;= l) <span class="kw">return</span> e;</code></div>
+<div class="code-row" data-no="38" id="lib4-line-38"><span class="num">38</span><code style="padding-left:10ch;text-indent:-2ch"><span class="kw">if</span> (l &lt;= a &amp;&amp; b &lt;= r) <span class="kw">return</span> d[k];</code></div>
+<div class="code-row shaded" data-no="39" id="lib4-line-39"><span class="num">39</span><code style="padding-left:10ch;text-indent:-2ch">push(k, b - a);</code></div>
+<div class="code-row" data-no="40" id="lib4-line-40"><span class="num">40</span><code style="padding-left:10ch;text-indent:-2ch"><span class="kw">int</span> m = (a + b) / <span class="literal">2</span>;</code></div>
+<div class="code-row" data-no="41" id="lib4-line-41"><span class="num">41</span><code style="padding-left:10ch;text-indent:-2ch"><span class="kw">return</span> f1(query(l, r, k * <span class="literal">2</span>, a, m), query(l, r, k * <span class="literal">2</span> + <span class="literal">1</span>, m, b));</code></div>
+<div class="code-row" data-no="42" id="lib4-line-42"><span class="num">42</span><code style="padding-left:6ch;text-indent:-2ch">}</code></div>
+<div class="code-row shaded" data-no="43" id="lib4-line-43"><span class="num">43</span><code style="padding-left:6ch;text-indent:-2ch"><span class="kw">void</span> apply(<span class="kw">int</span> l, <span class="kw">int</span> r, S f, <span class="kw">int</span> k = <span class="literal">1</span>, <span class="kw">int</span> a = <span class="literal">0</span>, <span class="kw">int</span> b = -<span class="literal">1</span>) {</code></div>
+<div class="code-row shaded" data-no="44" id="lib4-line-44"><span class="num">44</span><code style="padding-left:10ch;text-indent:-2ch"><span class="kw">if</span> (b &lt; <span class="literal">0</span>) b = sz;</code></div>
+<div class="code-row shaded" data-no="45" id="lib4-line-45"><span class="num">45</span><code style="padding-left:10ch;text-indent:-2ch"><span class="kw">if</span> (r &lt;= a || b &lt;= l) <span class="kw">return</span>;</code></div>
+<div class="code-row shaded" data-no="46" id="lib4-line-46"><span class="num">46</span><code style="padding-left:10ch;text-indent:-2ch"><span class="kw">if</span> (l &lt;= a &amp;&amp; b &lt;= r) {</code></div>
+<div class="code-row shaded" data-no="47" id="lib4-line-47"><span class="num">47</span><code style="padding-left:14ch;text-indent:-2ch">d[k] = f2(d[k], f, b - a);</code></div>
+<div class="code-row shaded" data-no="48" id="lib4-line-48"><span class="num">48</span><code style="padding-left:14ch;text-indent:-2ch"><span class="kw">if</span> (k &lt; sz) lz[k] = f3(lz[k], f);</code></div>
+<div class="code-row shaded" data-no="49" id="lib4-line-49"><span class="num">49</span><code style="padding-left:14ch;text-indent:-2ch"><span class="kw">return</span>;</code></div>
+<div class="code-row shaded" data-no="50" id="lib4-line-50"><span class="num">50</span><code style="padding-left:10ch;text-indent:-2ch">}</code></div>
+<div class="code-row shaded" data-no="51" id="lib4-line-51"><span class="num">51</span><code style="padding-left:10ch;text-indent:-2ch">push(k, b - a);</code></div>
+<div class="code-row shaded" data-no="52" id="lib4-line-52"><span class="num">52</span><code style="padding-left:10ch;text-indent:-2ch"><span class="kw">int</span> m = (a + b) / <span class="literal">2</span>;</code></div>
+<div class="code-row shaded" data-no="53" id="lib4-line-53"><span class="num">53</span><code style="padding-left:10ch;text-indent:-2ch">apply(l, r, f, k * <span class="literal">2</span>, a, m);</code></div>
+<div class="code-row shaded" data-no="54" id="lib4-line-54"><span class="num">54</span><code style="padding-left:10ch;text-indent:-2ch">apply(l, r, f, k * <span class="literal">2</span> + <span class="literal">1</span>, m, b);</code></div>
+<div class="code-row shaded" data-no="55" id="lib4-line-55"><span class="num">55</span><code style="padding-left:10ch;text-indent:-2ch">d[k] = f1(d[k * <span class="literal">2</span>], d[k * <span class="literal">2</span> + <span class="literal">1</span>]);</code></div>
+<div class="code-row shaded" data-no="56" id="lib4-line-56"><span class="num">56</span><code style="padding-left:6ch;text-indent:-2ch">}</code></div>
+<div class="code-row" data-no="57" id="lib4-line-57"><span class="num">57</span><code style="padding-left:6ch;text-indent:-2ch">T get(<span class="kw">int</span> i) { <span class="kw">return</span> query(i, i + <span class="literal">1</span>); }</code></div>
+<div class="code-row" data-no="58" id="lib4-line-58"><span class="num">58</span><code style="padding-left:2ch;text-indent:-2ch">};</code></div>
+<div class="note-start"><h2>説明</h2></div>
+<section class="note"><div class="target"><a class="ref" href="#lib4-line-3">3</a><code>T f1(T x, T y) { <span class="kw">return</span> x + y; }</code></div><div class="description"><p class="meta expl">f1: モノイドの二項演算</p></div></section>
+<section class="note"><div class="target"><a class="ref" href="#lib4-line-4">4</a><code>T e = <span class="literal">0</span>;</code></div><div class="description"><p class="meta expl">e: f1の単位元</p></div></section>
+<section class="note"><div class="target"><a class="ref" href="#lib4-line-6">6</a><code>T f2(T x, S f, <span class="kw">int</span> len) { <span class="kw">return</span> f.first * x + f.second * len; }</code></div><div class="description"><p class="meta expl">f2: 区間集約値に作用を適用する関数</p><p class="meta text">f2(f1(x,y),f,n+m) = f1(f2(x,f,n),f2(y,f,m))</p><p class="meta text">f2(x,le,len) = x</p></div></section>
+<section class="note"><div class="target"><a class="ref" href="#lib4-line-7">7</a><code>S f3(S o, S n) { <span class="kw">return</span> {o.first * n.first, n.first * o.second + n.second}; }</code></div><div class="description"><p class="meta expl">f3: モノイドの二項演算（古い作用oの後に新しい作用nを適用）</p><p class="meta text">f2(f2(x,o,len),n,len) = f2(x,f3(o,n),len)</p></div></section>
+<section class="note"><div class="target"><a class="ref" href="#lib4-line-8">8</a><code>S le = {<span class="literal">1</span>, <span class="literal">0</span>};</code></div><div class="description"><p class="meta expl">le: f3の単位元</p></div></section>
+<section class="note"><div class="target"><a class="ref" href="#lib4-line-13">13</a><code>SegTree(<span class="kw">int</span> n) {</code></div><div class="description"><p class="meta comp">計算量 O(n)</p></div></section>
+<section class="note"><div class="target"><a class="ref" href="#lib4-line-18">18</a><code><span class="kw">void</span> push(<span class="kw">int</span> k, <span class="kw">int</span> len) {</code></div><div class="description"><p class="meta expl">ノードkに蓄積された作用を左右の子へ伝搬する</p><p class="meta comp">計算量 O(1)</p></div></section>
+<section class="note"><div class="target"><a class="ref" href="#lib4-line-29">29</a><code><span class="kw">void</span> set(<span class="kw">int</span> i, T x) {</code></div><div class="description"><p class="meta expl">i番目の要素をxに変更する</p><p class="meta comp">計算量 O(log n)</p></div></section>
+<section class="note"><div class="target"><a class="ref" href="#lib4-line-35">35</a><code>T query(<span class="kw">int</span> l, <span class="kw">int</span> r, <span class="kw">int</span> k = <span class="literal">1</span>, <span class="kw">int</span> a = <span class="literal">0</span>, <span class="kw">int</span> b = -<span class="literal">1</span>) {</code></div><div class="description"><p class="meta expl">半開区間[l,r)の集約値を返す</p><p class="meta comp">計算量 O(log n)</p></div></section>
+<section class="note"><div class="target"><a class="ref" href="#lib4-line-43">43</a><code><span class="kw">void</span> apply(<span class="kw">int</span> l, <span class="kw">int</span> r, S f, <span class="kw">int</span> k = <span class="literal">1</span>, <span class="kw">int</span> a = <span class="literal">0</span>, <span class="kw">int</span> b = -<span class="literal">1</span>) {</code></div><div class="description"><p class="meta expl">半開区間[l,r)に作用fを適用する</p><p class="meta comp">計算量 O(log n)</p></div></section>
+<section class="note"><div class="target"><a class="ref" href="#lib4-line-57">57</a><code>T get(<span class="kw">int</span> i) { <span class="kw">return</span> query(i, i + <span class="literal">1</span>); }</code></div><div class="description"><p class="meta expl">i番目の要素を返す</p><p class="meta comp">計算量 O(log n)</p></div></section>
+</section>
+<section class="library-source">
+<header class="intro"><h1>UnionFind</h1></header>
+<div class="code-row" data-no="1" id="lib5-line-1"><span class="num">1</span><code style="padding-left:2ch;text-indent:-2ch"><span class="kw">struct</span> UnionFind {</code></div>
+<div class="code-row" data-no="2" id="lib5-line-2"><span class="num">2</span><code style="padding-left:6ch;text-indent:-2ch">vector&lt;<span class="kw">int</span>&gt; p;</code></div>
+<div class="code-row" data-no="3" id="lib5-line-3"><span class="num">3</span><code style="padding-left:6ch;text-indent:-2ch">UnionFind(<span class="kw">int</span> n) : p(n + <span class="literal">1</span>, -<span class="literal">1</span>) {}</code></div>
+<div class="code-row" data-no="4" id="lib5-line-4"><span class="num">4</span><code style="padding-left:6ch;text-indent:-2ch"><span class="kw">int</span> root(<span class="kw">int</span> x) {</code></div>
+<div class="code-row" data-no="5" id="lib5-line-5"><span class="num">5</span><code style="padding-left:10ch;text-indent:-2ch"><span class="kw">if</span> (p[x] &lt; <span class="literal">0</span>) <span class="kw">return</span> x;</code></div>
+<div class="code-row" data-no="6" id="lib5-line-6"><span class="num">6</span><code style="padding-left:10ch;text-indent:-2ch"><span class="kw">return</span> p[x] = root(p[x]);</code></div>
+<div class="code-row" data-no="7" id="lib5-line-7"><span class="num">7</span><code style="padding-left:6ch;text-indent:-2ch">}</code></div>
+<div class="code-row" data-no="8" id="lib5-line-8"><span class="num">8</span><code style="padding-left:6ch;text-indent:-2ch"><span class="kw">bool</span> unite(<span class="kw">int</span> u, <span class="kw">int</span> v) {</code></div>
+<div class="code-row" data-no="9" id="lib5-line-9"><span class="num">9</span><code style="padding-left:10ch;text-indent:-2ch"><span class="kw">int</span> ru = root(u), rv = root(v);</code></div>
+<div class="code-row" data-no="10" id="lib5-line-10"><span class="num">10</span><code style="padding-left:10ch;text-indent:-2ch"><span class="kw">if</span> (ru == rv) <span class="kw">return</span> <span class="kw">false</span>;</code></div>
+<div class="code-row" data-no="11" id="lib5-line-11"><span class="num">11</span><code style="padding-left:10ch;text-indent:-2ch"><span class="kw">if</span> (p[ru] &gt; p[rv]) swap(ru, rv);</code></div>
+<div class="code-row" data-no="12" id="lib5-line-12"><span class="num">12</span><code style="padding-left:10ch;text-indent:-2ch">p[ru] += p[rv];</code></div>
+<div class="code-row" data-no="13" id="lib5-line-13"><span class="num">13</span><code style="padding-left:10ch;text-indent:-2ch">p[rv] = ru;</code></div>
+<div class="code-row" data-no="14" id="lib5-line-14"><span class="num">14</span><code style="padding-left:10ch;text-indent:-2ch"><span class="kw">return</span> <span class="kw">true</span>;</code></div>
+<div class="code-row" data-no="15" id="lib5-line-15"><span class="num">15</span><code style="padding-left:6ch;text-indent:-2ch">}</code></div>
+<div class="code-row" data-no="16" id="lib5-line-16"><span class="num">16</span><code style="padding-left:6ch;text-indent:-2ch"><span class="kw">bool</span> same(<span class="kw">int</span> u, <span class="kw">int</span> v) { <span class="kw">return</span> root(u) == root(v); }</code></div>
+<div class="code-row" data-no="17" id="lib5-line-17"><span class="num">17</span><code style="padding-left:2ch;text-indent:-2ch">};</code></div>
+</section>
+<section class="library-source">
+<header class="intro"><h1>WeightedUnionFind</h1></header>
+<div class="code-row" data-no="1" id="lib6-line-1"><span class="num">1</span><code style="padding-left:2ch;text-indent:-2ch"><span class="kw">struct</span> WeightedUnionFind {</code></div>
+<div class="code-row" data-no="2" id="lib6-line-2"><span class="num">2</span><code style="padding-left:6ch;text-indent:-2ch">vector&lt;<span class="kw">int</span>&gt; p, d;</code></div>
+<div class="code-row" data-no="3" id="lib6-line-3"><span class="num">3</span><code style="padding-left:6ch;text-indent:-2ch">WeightedUnionFind(<span class="kw">int</span> n) : p(n + <span class="literal">1</span>, -<span class="literal">1</span>), d(n + <span class="literal">1</span>) {}</code></div>
+<div class="code-row" data-no="4" id="lib6-line-4"><span class="num">4</span><code style="padding-left:6ch;text-indent:-2ch"><span class="kw">int</span> root(<span class="kw">int</span> x) {</code></div>
+<div class="code-row" data-no="5" id="lib6-line-5"><span class="num">5</span><code style="padding-left:10ch;text-indent:-2ch"><span class="kw">if</span> (p[x] &lt; <span class="literal">0</span>) <span class="kw">return</span> x;</code></div>
+<div class="code-row" data-no="6" id="lib6-line-6"><span class="num">6</span><code style="padding-left:10ch;text-indent:-2ch"><span class="kw">int</span> y = root(p[x]);</code></div>
+<div class="code-row" data-no="7" id="lib6-line-7"><span class="num">7</span><code style="padding-left:10ch;text-indent:-2ch">d[x] += d[p[x]];</code></div>
+<div class="code-row" data-no="8" id="lib6-line-8"><span class="num">8</span><code style="padding-left:10ch;text-indent:-2ch"><span class="kw">return</span> p[x] = y;</code></div>
+<div class="code-row" data-no="9" id="lib6-line-9"><span class="num">9</span><code style="padding-left:6ch;text-indent:-2ch">}</code></div>
+<div class="code-row" data-no="10" id="lib6-line-10"><span class="num">10</span><code style="padding-left:6ch;text-indent:-2ch"><span class="kw">int</span> unite(<span class="kw">int</span> u, <span class="kw">int</span> v, <span class="kw">int</span> w) {</code></div>
+<div class="code-row" data-no="11" id="lib6-line-11"><span class="num">11</span><code style="padding-left:10ch;text-indent:-2ch"><span class="kw">int</span> ru = root(u), rv = root(v);</code></div>
+<div class="code-row" data-no="12" id="lib6-line-12"><span class="num">12</span><code style="padding-left:10ch;text-indent:-2ch"><span class="kw">if</span> (ru == rv) <span class="kw">return</span> d[v] - d[u] == w ? -<span class="literal">1</span> : -<span class="literal">2</span>;</code></div>
+<div class="code-row" data-no="13" id="lib6-line-13"><span class="num">13</span><code style="padding-left:10ch;text-indent:-2ch">w += d[u] - d[v];</code></div>
+<div class="code-row" data-no="14" id="lib6-line-14"><span class="num">14</span><code style="padding-left:10ch;text-indent:-2ch"><span class="kw">if</span> (p[ru] &gt; p[rv]) {</code></div>
+<div class="code-row" data-no="15" id="lib6-line-15"><span class="num">15</span><code style="padding-left:14ch;text-indent:-2ch">swap(ru, rv);</code></div>
+<div class="code-row" data-no="16" id="lib6-line-16"><span class="num">16</span><code style="padding-left:14ch;text-indent:-2ch">w = -w;</code></div>
+<div class="code-row" data-no="17" id="lib6-line-17"><span class="num">17</span><code style="padding-left:10ch;text-indent:-2ch">}</code></div>
+<div class="code-row" data-no="18" id="lib6-line-18"><span class="num">18</span><code style="padding-left:10ch;text-indent:-2ch">p[ru] += p[rv];</code></div>
+<div class="code-row" data-no="19" id="lib6-line-19"><span class="num">19</span><code style="padding-left:10ch;text-indent:-2ch">p[rv] = ru;</code></div>
+<div class="code-row" data-no="20" id="lib6-line-20"><span class="num">20</span><code style="padding-left:10ch;text-indent:-2ch">d[rv] = w;</code></div>
+<div class="code-row" data-no="21" id="lib6-line-21"><span class="num">21</span><code style="padding-left:10ch;text-indent:-2ch"><span class="kw">return</span> ru;</code></div>
+<div class="code-row" data-no="22" id="lib6-line-22"><span class="num">22</span><code style="padding-left:6ch;text-indent:-2ch">}</code></div>
+<div class="code-row" data-no="23" id="lib6-line-23"><span class="num">23</span><code style="padding-left:2ch;text-indent:-2ch">};</code></div>
+</section>
+<section class="library-source">
+<header class="intro"><h1>base</h1></header>
+<div class="code-row" data-no="1" id="lib7-line-1"><span class="num">1</span><code style="padding-left:2ch;text-indent:-2ch">#include &lt;bits/stdc++.h&gt;</code></div>
+<div class="code-row" data-no="2" id="lib7-line-2"><span class="num">2</span><code style="padding-left:2ch;text-indent:-2ch"><span class="kw">using</span> <span class="kw">namespace</span> std;</code></div>
+<div class="code-row" data-no="3" id="lib7-line-3"><span class="num">3</span><code style="padding-left:2ch;text-indent:-2ch">#define <span class="kw">int</span> <span class="kw">long</span> <span class="kw">long</span></code></div>
+<div class="code-row" data-no="4" id="lib7-line-4"><span class="num">4</span><code style="padding-left:2ch;text-indent:-2ch"></code></div>
+<div class="code-row" data-no="5" id="lib7-line-5"><span class="num">5</span><code style="padding-left:2ch;text-indent:-2ch">#ifndef DEBUG_OUT</code></div>
+<div class="code-row" data-no="6" id="lib7-line-6"><span class="num">6</span><code style="padding-left:2ch;text-indent:-2ch">#define debug(...) ((<span class="kw">void</span>)<span class="literal">0</span>)</code></div>
+<div class="code-row" data-no="7" id="lib7-line-7"><span class="num">7</span><code style="padding-left:2ch;text-indent:-2ch">#endif</code></div>
+<div class="code-row" data-no="8" id="lib7-line-8"><span class="num">8</span><code style="padding-left:2ch;text-indent:-2ch"></code></div>
+<div class="code-row" data-no="9" id="lib7-line-9"><span class="num">9</span><code style="padding-left:2ch;text-indent:-2ch"><span class="kw">signed</span> main() {}</code></div>
+</section>
+<section class="library-source">
+<header class="intro"><h1>debug</h1></header>
+<div class="code-row" data-no="1" id="lib8-line-1"><span class="num">1</span><code style="padding-left:2ch;text-indent:-2ch">#ifdef DEBUG_OUT</code></div>
+<div class="code-row" data-no="2" id="lib8-line-2"><span class="num">2</span><code style="padding-left:2ch;text-indent:-2ch">#include &lt;iostream&gt;</code></div>
+<div class="code-row" data-no="3" id="lib8-line-3"><span class="num">3</span><code style="padding-left:2ch;text-indent:-2ch">#include &lt;string_view&gt;</code></div>
+<div class="code-row" data-no="4" id="lib8-line-4"><span class="num">4</span><code style="padding-left:2ch;text-indent:-2ch"><span class="kw">using</span> <span class="kw">namespace</span> std;</code></div>
+<div class="code-row" data-no="5" id="lib8-line-5"><span class="num">5</span><code style="padding-left:2ch;text-indent:-2ch"><span class="kw">template</span> &lt;<span class="kw">class</span> T&gt;</code></div>
+<div class="code-row" data-no="6" id="lib8-line-6"><span class="num">6</span><code style="padding-left:2ch;text-indent:-2ch">concept Range = requires(<span class="kw">const</span> T &amp;x) { begin(x); };</code></div>
+<div class="code-row" data-no="7" id="lib8-line-7"><span class="num">7</span><code style="padding-left:2ch;text-indent:-2ch"><span class="kw">template</span> &lt;<span class="kw">class</span> T&gt;</code></div>
+<div class="code-row" data-no="8" id="lib8-line-8"><span class="num">8</span><code style="padding-left:2ch;text-indent:-2ch">concept Tuple = requires { tuple_size&lt;remove_cvref_t&lt;T&gt;&gt;::value; };</code></div>
+<div class="code-row" data-no="9" id="lib8-line-9"><span class="num">9</span><code style="padding-left:2ch;text-indent:-2ch"><span class="kw">template</span> &lt;<span class="kw">class</span> T&gt;</code></div>
+<div class="code-row" data-no="10" id="lib8-line-10"><span class="num">10</span><code style="padding-left:2ch;text-indent:-2ch">concept Text = requires(<span class="kw">const</span> T &amp;x) { string_view(x); };</code></div>
+<div class="code-row" data-no="11" id="lib8-line-11"><span class="num">11</span><code style="padding-left:2ch;text-indent:-2ch"><span class="kw">template</span> &lt;<span class="kw">class</span> T&gt;</code></div>
+<div class="code-row" data-no="12" id="lib8-line-12"><span class="num">12</span><code style="padding-left:2ch;text-indent:-2ch"><span class="kw">void</span> Dprint(<span class="kw">const</span> T &amp;x) {</code></div>
+<div class="code-row" data-no="13" id="lib8-line-13"><span class="num">13</span><code style="padding-left:6ch;text-indent:-2ch"><span class="kw">if</span> <span class="kw">constexpr</span> (Text&lt;T&gt;) {</code></div>
+<div class="code-row" data-no="14" id="lib8-line-14"><span class="num">14</span><code style="padding-left:10ch;text-indent:-2ch">cerr &lt;&lt; x;</code></div>
+<div class="code-row" data-no="15" id="lib8-line-15"><span class="num">15</span><code style="padding-left:6ch;text-indent:-2ch">} <span class="kw">else</span> <span class="kw">if</span> <span class="kw">constexpr</span> (Range&lt;T&gt;) {</code></div>
+<div class="code-row" data-no="16" id="lib8-line-16"><span class="num">16</span><code style="padding-left:10ch;text-indent:-2ch">cerr &lt;&lt; <span class="str">&#x27;{&#x27;</span>;</code></div>
+<div class="code-row" data-no="17" id="lib8-line-17"><span class="num">17</span><code style="padding-left:10ch;text-indent:-2ch"><span class="kw">bool</span> sep = <span class="literal">0</span>;</code></div>
+<div class="code-row" data-no="18" id="lib8-line-18"><span class="num">18</span><code style="padding-left:10ch;text-indent:-2ch"><span class="kw">for</span> (<span class="kw">const</span> <span class="kw">auto</span> &amp;e : x) {</code></div>
+<div class="code-row" data-no="19" id="lib8-line-19"><span class="num">19</span><code style="padding-left:14ch;text-indent:-2ch"><span class="kw">if</span> (sep) cerr &lt;&lt; <span class="str">&quot;,&quot;</span>;</code></div>
+<div class="code-row" data-no="20" id="lib8-line-20"><span class="num">20</span><code style="padding-left:14ch;text-indent:-2ch">Dprint(e);</code></div>
+<div class="code-row" data-no="21" id="lib8-line-21"><span class="num">21</span><code style="padding-left:14ch;text-indent:-2ch">sep = <span class="literal">1</span>;</code></div>
+<div class="code-row" data-no="22" id="lib8-line-22"><span class="num">22</span><code style="padding-left:10ch;text-indent:-2ch">}</code></div>
+<div class="code-row" data-no="23" id="lib8-line-23"><span class="num">23</span><code style="padding-left:10ch;text-indent:-2ch">cerr &lt;&lt; <span class="str">&#x27;}&#x27;</span>;</code></div>
+<div class="code-row" data-no="24" id="lib8-line-24"><span class="num">24</span><code style="padding-left:6ch;text-indent:-2ch">} <span class="kw">else</span> <span class="kw">if</span> <span class="kw">constexpr</span> (Tuple&lt;T&gt;) {</code></div>
+<div class="code-row" data-no="25" id="lib8-line-25"><span class="num">25</span><code style="padding-left:10ch;text-indent:-2ch">cerr &lt;&lt; <span class="str">&#x27;{&#x27;</span>;</code></div>
+<div class="code-row" data-no="26" id="lib8-line-26"><span class="num">26</span><code style="padding-left:10ch;text-indent:-2ch"><span class="kw">bool</span> sep = <span class="literal">0</span>;</code></div>
+<div class="code-row" data-no="27" id="lib8-line-27"><span class="num">27</span><code style="padding-left:10ch;text-indent:-2ch"><span class="kw">auto</span> one = [&amp;](<span class="kw">const</span> <span class="kw">auto</span> &amp;e) {</code></div>
+<div class="code-row" data-no="28" id="lib8-line-28"><span class="num">28</span><code style="padding-left:14ch;text-indent:-2ch"><span class="kw">if</span> (sep) cerr &lt;&lt; <span class="str">&quot;,&quot;</span>;</code></div>
+<div class="code-row" data-no="29" id="lib8-line-29"><span class="num">29</span><code style="padding-left:14ch;text-indent:-2ch">Dprint(e);</code></div>
+<div class="code-row" data-no="30" id="lib8-line-30"><span class="num">30</span><code style="padding-left:14ch;text-indent:-2ch">sep = <span class="literal">1</span>;</code></div>
+<div class="code-row" data-no="31" id="lib8-line-31"><span class="num">31</span><code style="padding-left:10ch;text-indent:-2ch">};</code></div>
+<div class="code-row" data-no="32" id="lib8-line-32"><span class="num">32</span><code style="padding-left:10ch;text-indent:-2ch">apply([&amp;](<span class="kw">const</span> <span class="kw">auto</span> &amp;...e) { (one(e), ...); }, x);</code></div>
+<div class="code-row" data-no="33" id="lib8-line-33"><span class="num">33</span><code style="padding-left:10ch;text-indent:-2ch">cerr &lt;&lt; <span class="str">&#x27;}&#x27;</span>;</code></div>
+<div class="code-row" data-no="34" id="lib8-line-34"><span class="num">34</span><code style="padding-left:6ch;text-indent:-2ch">} <span class="kw">else</span> {</code></div>
+<div class="code-row" data-no="35" id="lib8-line-35"><span class="num">35</span><code style="padding-left:10ch;text-indent:-2ch">cerr &lt;&lt; x;</code></div>
+<div class="code-row" data-no="36" id="lib8-line-36"><span class="num">36</span><code style="padding-left:6ch;text-indent:-2ch">}</code></div>
+<div class="code-row" data-no="37" id="lib8-line-37"><span class="num">37</span><code style="padding-left:2ch;text-indent:-2ch">}</code></div>
+<div class="code-row" data-no="38" id="lib8-line-38"><span class="num">38</span><code style="padding-left:2ch;text-indent:-2ch"><span class="kw">template</span> &lt;<span class="kw">class</span>... T&gt;</code></div>
+<div class="code-row" data-no="39" id="lib8-line-39"><span class="num">39</span><code style="padding-left:2ch;text-indent:-2ch"><span class="kw">void</span> print(<span class="kw">int</span> line, <span class="kw">const</span> T &amp;...args) {</code></div>
+<div class="code-row" data-no="40" id="lib8-line-40"><span class="num">40</span><code style="padding-left:6ch;text-indent:-2ch">cerr &lt;&lt; <span class="str">&#x27;[&#x27;</span> &lt;&lt; line &lt;&lt; <span class="str">&quot;] &quot;</span>;</code></div>
+<div class="code-row" data-no="41" id="lib8-line-41"><span class="num">41</span><code style="padding-left:6ch;text-indent:-2ch">size_t i = <span class="literal">0</span>;</code></div>
+<div class="code-row" data-no="42" id="lib8-line-42"><span class="num">42</span><code style="padding-left:6ch;text-indent:-2ch"><span class="kw">auto</span> one = [&amp;](<span class="kw">const</span> <span class="kw">auto</span> &amp;x) {</code></div>
+<div class="code-row" data-no="43" id="lib8-line-43"><span class="num">43</span><code style="padding-left:10ch;text-indent:-2ch"><span class="kw">if</span> (i) cerr &lt;&lt; <span class="str">&#x27;,&#x27;</span>;</code></div>
+<div class="code-row" data-no="44" id="lib8-line-44"><span class="num">44</span><code style="padding-left:10ch;text-indent:-2ch"><span class="kw">const</span> <span class="kw">bool</span> color = i++ &amp; <span class="literal">1</span>;</code></div>
+<div class="code-row" data-no="45" id="lib8-line-45"><span class="num">45</span><code style="padding-left:10ch;text-indent:-2ch">cerr &lt;&lt; (color ? <span class="str">&quot;\033[96m&quot;</span> : <span class="str">&quot;&quot;</span>);</code></div>
+<div class="code-row" data-no="46" id="lib8-line-46"><span class="num">46</span><code style="padding-left:10ch;text-indent:-2ch">Dprint(x);</code></div>
+<div class="code-row" data-no="47" id="lib8-line-47"><span class="num">47</span><code style="padding-left:10ch;text-indent:-2ch">cerr &lt;&lt; (color ? <span class="str">&quot;\033[0m&quot;</span> : <span class="str">&quot;&quot;</span>);</code></div>
+<div class="code-row" data-no="48" id="lib8-line-48"><span class="num">48</span><code style="padding-left:6ch;text-indent:-2ch">};</code></div>
+<div class="code-row" data-no="49" id="lib8-line-49"><span class="num">49</span><code style="padding-left:6ch;text-indent:-2ch">(one(args), ...);</code></div>
+<div class="code-row" data-no="50" id="lib8-line-50"><span class="num">50</span><code style="padding-left:6ch;text-indent:-2ch">cerr &lt;&lt; <span class="str">&#x27;\n&#x27;</span>;</code></div>
+<div class="code-row" data-no="51" id="lib8-line-51"><span class="num">51</span><code style="padding-left:2ch;text-indent:-2ch">}</code></div>
+<div class="code-row" data-no="52" id="lib8-line-52"><span class="num">52</span><code style="padding-left:2ch;text-indent:-2ch"></code></div>
+<div class="code-row" data-no="53" id="lib8-line-53"><span class="num">53</span><code style="padding-left:2ch;text-indent:-2ch">#define debug(...) print(__LINE__, __VA_ARGS__)</code></div>
+<div class="code-row" data-no="54" id="lib8-line-54"><span class="num">54</span><code style="padding-left:2ch;text-indent:-2ch"></code></div>
+<div class="code-row" data-no="55" id="lib8-line-55"><span class="num">55</span><code style="padding-left:2ch;text-indent:-2ch">#endif</code></div>
+</section>
+<section class="library-source">
+<header class="intro"><h1>Prime</h1><p>SPF、64bit素数判定（Miller-Rabin法）、素因数分解（Pollard Rho法）</p></header>
+<div class="code-row" data-no="1" id="lib9-line-1"><span class="num">1</span><code style="padding-left:2ch;text-indent:-2ch"><span class="kw">using</span> ll = <span class="kw">long</span> <span class="kw">long</span>;</code></div>
+<div class="code-row" data-no="2" id="lib9-line-2"><span class="num">2</span><code style="padding-left:2ch;text-indent:-2ch"><span class="kw">bool</span> isprime(ll n) {</code></div>
+<div class="code-row" data-no="3" id="lib9-line-3"><span class="num">3</span><code style="padding-left:6ch;text-indent:-2ch"><span class="kw">if</span> (n &lt; <span class="literal">3</span>) <span class="kw">return</span> n == <span class="literal">2</span>;</code></div>
+<div class="code-row" data-no="4" id="lib9-line-4"><span class="num">4</span><code style="padding-left:6ch;text-indent:-2ch"><span class="kw">if</span> (!(n &amp; <span class="literal">1</span>)) <span class="kw">return</span> <span class="kw">false</span>;</code></div>
+<div class="code-row" data-no="5" id="lib9-line-5"><span class="num">5</span><code style="padding-left:2ch;text-indent:-2ch"></code></div>
+<div class="code-row" data-no="6" id="lib9-line-6"><span class="num">6</span><code style="padding-left:6ch;text-indent:-2ch">ll d = n - <span class="literal">1</span>;</code></div>
+<div class="code-row" data-no="7" id="lib9-line-7"><span class="num">7</span><code style="padding-left:6ch;text-indent:-2ch"><span class="kw">int</span> s = <span class="literal">0</span>;</code></div>
+<div class="code-row" data-no="8" id="lib9-line-8"><span class="num">8</span><code style="padding-left:6ch;text-indent:-2ch"><span class="kw">while</span> (!(d &amp; <span class="literal">1</span>)) d &gt;&gt;= <span class="literal">1</span>, s++;</code></div>
+<div class="code-row" data-no="9" id="lib9-line-9"><span class="num">9</span><code style="padding-left:2ch;text-indent:-2ch"></code></div>
+<div class="code-row" data-no="10" id="lib9-line-10"><span class="num">10</span><code style="padding-left:6ch;text-indent:-2ch"><span class="kw">for</span> (ll a : {<span class="literal">2</span>, <span class="literal">325</span>, <span class="literal">9375</span>, <span class="literal">28178</span>, <span class="literal">450775</span>, <span class="literal">9780504</span>, <span class="literal">1795265022</span>}) {</code></div>
+<div class="code-row" data-no="11" id="lib9-line-11"><span class="num">11</span><code style="padding-left:10ch;text-indent:-2ch">a %= n;</code></div>
+<div class="code-row" data-no="12" id="lib9-line-12"><span class="num">12</span><code style="padding-left:10ch;text-indent:-2ch"><span class="kw">if</span> (!a) <span class="kw">continue</span>;</code></div>
+<div class="code-row" data-no="13" id="lib9-line-13"><span class="num">13</span><code style="padding-left:2ch;text-indent:-2ch"></code></div>
+<div class="code-row" data-no="14" id="lib9-line-14"><span class="num">14</span><code style="padding-left:10ch;text-indent:-2ch">ll x = <span class="literal">1</span>, v = a, e = d;</code></div>
+<div class="code-row" data-no="15" id="lib9-line-15"><span class="num">15</span><code style="padding-left:10ch;text-indent:-2ch"><span class="kw">while</span> (e) {</code></div>
+<div class="code-row" data-no="16" id="lib9-line-16"><span class="num">16</span><code style="padding-left:14ch;text-indent:-2ch"><span class="kw">if</span> (e &amp; <span class="literal">1</span>) x = (__int128)x * v % n;</code></div>
+<div class="code-row" data-no="17" id="lib9-line-17"><span class="num">17</span><code style="padding-left:14ch;text-indent:-2ch">v = (__int128)v * v % n;</code></div>
+<div class="code-row" data-no="18" id="lib9-line-18"><span class="num">18</span><code style="padding-left:14ch;text-indent:-2ch">e &gt;&gt;= <span class="literal">1</span>;</code></div>
+<div class="code-row" data-no="19" id="lib9-line-19"><span class="num">19</span><code style="padding-left:10ch;text-indent:-2ch">}</code></div>
+<div class="code-row" data-no="20" id="lib9-line-20"><span class="num">20</span><code style="padding-left:2ch;text-indent:-2ch"></code></div>
+<div class="code-row" data-no="21" id="lib9-line-21"><span class="num">21</span><code style="padding-left:10ch;text-indent:-2ch"><span class="kw">if</span> (x == <span class="literal">1</span>) <span class="kw">continue</span>;</code></div>
+<div class="code-row" data-no="22" id="lib9-line-22"><span class="num">22</span><code style="padding-left:10ch;text-indent:-2ch"><span class="kw">for</span> (<span class="kw">int</span> i = <span class="literal">0</span>; i &lt; s; i++) {</code></div>
+<div class="code-row" data-no="23" id="lib9-line-23"><span class="num">23</span><code style="padding-left:14ch;text-indent:-2ch"><span class="kw">if</span> (x == n - <span class="literal">1</span>) <span class="kw">break</span>;</code></div>
+<div class="code-row" data-no="24" id="lib9-line-24"><span class="num">24</span><code style="padding-left:14ch;text-indent:-2ch">x = (__int128)x * x % n;</code></div>
+<div class="code-row" data-no="25" id="lib9-line-25"><span class="num">25</span><code style="padding-left:10ch;text-indent:-2ch">}</code></div>
+<div class="code-row" data-no="26" id="lib9-line-26"><span class="num">26</span><code style="padding-left:10ch;text-indent:-2ch"><span class="kw">if</span> (x != n - <span class="literal">1</span>) <span class="kw">return</span> <span class="kw">false</span>;</code></div>
+<div class="code-row" data-no="27" id="lib9-line-27"><span class="num">27</span><code style="padding-left:6ch;text-indent:-2ch">}</code></div>
+<div class="code-row" data-no="28" id="lib9-line-28"><span class="num">28</span><code style="padding-left:6ch;text-indent:-2ch"><span class="kw">return</span> <span class="kw">true</span>;</code></div>
+<div class="code-row" data-no="29" id="lib9-line-29"><span class="num">29</span><code style="padding-left:2ch;text-indent:-2ch">}</code></div>
+<div class="code-row" data-no="30" id="lib9-line-30"><span class="num">30</span><code style="padding-left:2ch;text-indent:-2ch"><span class="kw">struct</span> SPF {</code></div>
+<div class="code-row" data-no="31" id="lib9-line-31"><span class="num">31</span><code style="padding-left:6ch;text-indent:-2ch">vector&lt;<span class="kw">int</span>&gt; p, t;</code></div>
+<div class="code-row" data-no="32" id="lib9-line-32"><span class="num">32</span><code style="padding-left:6ch;text-indent:-2ch">SPF(<span class="kw">int</span> n) : t(n + <span class="literal">1</span>) {</code></div>
+<div class="code-row" data-no="33" id="lib9-line-33"><span class="num">33</span><code style="padding-left:10ch;text-indent:-2ch"><span class="kw">for</span> (<span class="kw">int</span> i = <span class="literal">2</span>; i &lt;= n; i++) {</code></div>
+<div class="code-row" data-no="34" id="lib9-line-34"><span class="num">34</span><code style="padding-left:14ch;text-indent:-2ch"><span class="kw">if</span> (!t[i]) {</code></div>
+<div class="code-row" data-no="35" id="lib9-line-35"><span class="num">35</span><code style="padding-left:18ch;text-indent:-2ch">p.push_back(i);</code></div>
+<div class="code-row" data-no="36" id="lib9-line-36"><span class="num">36</span><code style="padding-left:18ch;text-indent:-2ch">t[i] = i;</code></div>
+<div class="code-row" data-no="37" id="lib9-line-37"><span class="num">37</span><code style="padding-left:14ch;text-indent:-2ch">}</code></div>
+<div class="code-row" data-no="38" id="lib9-line-38"><span class="num">38</span><code style="padding-left:14ch;text-indent:-2ch"><span class="kw">for</span> (<span class="kw">auto</span>&amp; j : p) {</code></div>
+<div class="code-row" data-no="39" id="lib9-line-39"><span class="num">39</span><code style="padding-left:18ch;text-indent:-2ch"><span class="kw">if</span> (j &gt; t[i] || i &gt; n / j) <span class="kw">break</span>;</code></div>
+<div class="code-row" data-no="40" id="lib9-line-40"><span class="num">40</span><code style="padding-left:18ch;text-indent:-2ch">t[i * j] = j;</code></div>
+<div class="code-row" data-no="41" id="lib9-line-41"><span class="num">41</span><code style="padding-left:14ch;text-indent:-2ch">}</code></div>
+<div class="code-row" data-no="42" id="lib9-line-42"><span class="num">42</span><code style="padding-left:10ch;text-indent:-2ch">}</code></div>
+<div class="code-row" data-no="43" id="lib9-line-43"><span class="num">43</span><code style="padding-left:6ch;text-indent:-2ch">}</code></div>
+<div class="code-row" data-no="44" id="lib9-line-44"><span class="num">44</span><code style="padding-left:6ch;text-indent:-2ch"><span class="kw">void</span> fact(<span class="kw">int</span> n, vector&lt;ll&gt;&amp; r) {</code></div>
+<div class="code-row" data-no="45" id="lib9-line-45"><span class="num">45</span><code style="padding-left:10ch;text-indent:-2ch"><span class="kw">while</span> (n &gt; <span class="literal">1</span>) n /= r.emplace_back(t[n]);</code></div>
+<div class="code-row" data-no="46" id="lib9-line-46"><span class="num">46</span><code style="padding-left:6ch;text-indent:-2ch">}</code></div>
+<div class="code-row" data-no="47" id="lib9-line-47"><span class="num">47</span><code style="padding-left:2ch;text-indent:-2ch">};</code></div>
+<div class="code-row" data-no="48" id="lib9-line-48"><span class="num">48</span><code style="padding-left:2ch;text-indent:-2ch">ll rho(ll n) {</code></div>
+<div class="code-row" data-no="49" id="lib9-line-49"><span class="num">49</span><code style="padding-left:6ch;text-indent:-2ch"><span class="kw">if</span> (<span class="literal">1</span> - n % <span class="literal">2</span>) <span class="kw">return</span> <span class="literal">2</span>;</code></div>
+<div class="code-row" data-no="50" id="lib9-line-50"><span class="num">50</span><code style="padding-left:6ch;text-indent:-2ch"><span class="kw">for</span> (ll c = <span class="literal">1</span>;; c++) {</code></div>
+<div class="code-row" data-no="51" id="lib9-line-51"><span class="num">51</span><code style="padding-left:10ch;text-indent:-2ch"><span class="kw">auto</span> f = [&amp;](ll x) -&gt; ll { <span class="kw">return</span> ((__int128)x * x + c) % n; };</code></div>
+<div class="code-row" data-no="52" id="lib9-line-52"><span class="num">52</span><code style="padding-left:10ch;text-indent:-2ch">ll x = <span class="literal">2</span>, y = <span class="literal">2</span>;</code></div>
+<div class="code-row" data-no="53" id="lib9-line-53"><span class="num">53</span><code style="padding-left:10ch;text-indent:-2ch"><span class="kw">while</span> (<span class="kw">true</span>) {</code></div>
+<div class="code-row" data-no="54" id="lib9-line-54"><span class="num">54</span><code style="padding-left:14ch;text-indent:-2ch">x = f(x), y = f(f(y));</code></div>
+<div class="code-row" data-no="55" id="lib9-line-55"><span class="num">55</span><code style="padding-left:14ch;text-indent:-2ch">ll d = gcd(abs(x - y), n);</code></div>
+<div class="code-row" data-no="56" id="lib9-line-56"><span class="num">56</span><code style="padding-left:14ch;text-indent:-2ch"><span class="kw">if</span> (d == n) <span class="kw">break</span>;</code></div>
+<div class="code-row" data-no="57" id="lib9-line-57"><span class="num">57</span><code style="padding-left:14ch;text-indent:-2ch"><span class="kw">if</span> (d - <span class="literal">1</span>) <span class="kw">return</span> d;</code></div>
+<div class="code-row" data-no="58" id="lib9-line-58"><span class="num">58</span><code style="padding-left:10ch;text-indent:-2ch">}</code></div>
+<div class="code-row" data-no="59" id="lib9-line-59"><span class="num">59</span><code style="padding-left:6ch;text-indent:-2ch">}</code></div>
+<div class="code-row" data-no="60" id="lib9-line-60"><span class="num">60</span><code style="padding-left:2ch;text-indent:-2ch">}</code></div>
+<div class="code-row" data-no="61" id="lib9-line-61"><span class="num">61</span><code style="padding-left:2ch;text-indent:-2ch"></code></div>
+<div class="code-row shaded" data-no="62" id="lib9-line-62"><span class="num">62</span><code style="padding-left:2ch;text-indent:-2ch">SPF _spf(<span class="literal">1000000</span>);</code></div>
+<div class="code-row" data-no="63" id="lib9-line-63"><span class="num">63</span><code style="padding-left:2ch;text-indent:-2ch"><span class="kw">void</span> fact(ll n, vector&lt;ll&gt;&amp; r) {</code></div>
+<div class="code-row" data-no="64" id="lib9-line-64"><span class="num">64</span><code style="padding-left:6ch;text-indent:-2ch"><span class="kw">if</span> (n &lt; <span class="literal">2</span>) <span class="kw">return</span>;</code></div>
+<div class="code-row shaded" data-no="65" id="lib9-line-65"><span class="num">65</span><code style="padding-left:6ch;text-indent:-2ch"><span class="kw">if</span> (n &lt;= <span class="literal">1000000</span>) {</code></div>
+<div class="code-row shaded" data-no="66" id="lib9-line-66"><span class="num">66</span><code style="padding-left:10ch;text-indent:-2ch">_spf.fact(n, r);</code></div>
+<div class="code-row shaded" data-no="67" id="lib9-line-67"><span class="num">67</span><code style="padding-left:10ch;text-indent:-2ch"><span class="kw">return</span>;</code></div>
+<div class="code-row shaded" data-no="68" id="lib9-line-68"><span class="num">68</span><code style="padding-left:6ch;text-indent:-2ch">}</code></div>
+<div class="code-row" data-no="69" id="lib9-line-69"><span class="num">69</span><code style="padding-left:6ch;text-indent:-2ch"><span class="kw">if</span> (isprime(n)) r.push_back(n);</code></div>
+<div class="code-row" data-no="70" id="lib9-line-70"><span class="num">70</span><code style="padding-left:6ch;text-indent:-2ch"><span class="kw">else</span> {</code></div>
+<div class="code-row" data-no="71" id="lib9-line-71"><span class="num">71</span><code style="padding-left:10ch;text-indent:-2ch">ll d = rho(n);</code></div>
+<div class="code-row" data-no="72" id="lib9-line-72"><span class="num">72</span><code style="padding-left:10ch;text-indent:-2ch">fact(d, r);</code></div>
+<div class="code-row" data-no="73" id="lib9-line-73"><span class="num">73</span><code style="padding-left:10ch;text-indent:-2ch">fact(n / d, r);</code></div>
+<div class="code-row" data-no="74" id="lib9-line-74"><span class="num">74</span><code style="padding-left:6ch;text-indent:-2ch">}</code></div>
+<div class="code-row" data-no="75" id="lib9-line-75"><span class="num">75</span><code style="padding-left:2ch;text-indent:-2ch">}</code></div>
+<div class="note-start"><h2>説明</h2></div>
+<section class="note"><div class="target"><a class="ref" href="#lib9-line-2">2</a><code><span class="kw">bool</span> isprime(ll n) {</code></div><div class="description"><p class="meta expl">符号付き64bit整数の素数判定</p><p class="meta comp">計算量 O(log n)</p></div></section>
+<section class="note"><div class="target"><a class="ref" href="#lib9-line-30">30</a><code><span class="kw">struct</span> SPF {</code></div><div class="description"><p class="meta expl">最小素因数表と素数列をO(N)で構築する</p><p class="meta comp">計算量 O(N)</p></div></section>
+<section class="note"><div class="target"><a class="ref" href="#lib9-line-44">44</a><code><span class="kw">void</span> fact(<span class="kw">int</span> n, vector&lt;ll&gt;&amp; r) {</code></div><div class="description"><p class="meta expl">素因数を重複込みでrの末尾に追加する。1 &lt;= n &lt;= N</p><p class="meta comp">計算量 O(log n)</p></div></section>
+<section class="note"><div class="target"><a class="ref" href="#lib9-line-48">48</a><code>ll rho(ll n) {</code></div><div class="description"><p class="meta expl">合成数nの非自明な約数を1つ返す</p></div></section>
+<section class="note"><div class="target"><a class="ref" href="#lib9-line-63">63</a><code><span class="kw">void</span> fact(ll n, vector&lt;ll&gt;&amp; r) {</code></div><div class="description"><p class="meta expl">素因数を重複込みでrの末尾に追加する。必要ならsort(r.begin(),r.end())</p></div></section>
+</section>
+<section class="library-source">
+<header class="intro"><h1>String</h1><p>文字列アルゴリズム（Manacher・Z Algorithm）</p></header>
+<div class="code-row" data-no="1" id="lib10-line-1"><span class="num">1</span><code style="padding-left:2ch;text-indent:-2ch">vector&lt;<span class="kw">int</span>&gt; manacher(<span class="kw">const</span> string&amp; s) {</code></div>
+<div class="code-row" data-no="2" id="lib10-line-2"><span class="num">2</span><code style="padding-left:6ch;text-indent:-2ch"><span class="kw">int</span> n = s.size(), i = <span class="literal">0</span>, j = <span class="literal">1</span>, k;</code></div>
+<div class="code-row" data-no="3" id="lib10-line-3"><span class="num">3</span><code style="padding-left:6ch;text-indent:-2ch">vector&lt;<span class="kw">int</span>&gt; res(n);</code></div>
+<div class="code-row" data-no="4" id="lib10-line-4"><span class="num">4</span><code style="padding-left:6ch;text-indent:-2ch"><span class="kw">while</span> (i &lt; n) {</code></div>
+<div class="code-row" data-no="5" id="lib10-line-5"><span class="num">5</span><code style="padding-left:10ch;text-indent:-2ch"><span class="kw">while</span> (i &gt;= j &amp;&amp; i + j &lt; n &amp;&amp; s[i - j] == s[i + j]) j++;</code></div>
+<div class="code-row" data-no="6" id="lib10-line-6"><span class="num">6</span><code style="padding-left:10ch;text-indent:-2ch">res[i] = j;</code></div>
+<div class="code-row" data-no="7" id="lib10-line-7"><span class="num">7</span><code style="padding-left:10ch;text-indent:-2ch">k = <span class="literal">1</span>;</code></div>
+<div class="code-row" data-no="8" id="lib10-line-8"><span class="num">8</span><code style="padding-left:10ch;text-indent:-2ch"><span class="kw">while</span> (i - k &gt;= <span class="literal">0</span> &amp;&amp; i + k &lt; n &amp;&amp; k + res[i - k] &lt; j) {</code></div>
+<div class="code-row" data-no="9" id="lib10-line-9"><span class="num">9</span><code style="padding-left:14ch;text-indent:-2ch">res[i + k] = res[i - k];</code></div>
+<div class="code-row" data-no="10" id="lib10-line-10"><span class="num">10</span><code style="padding-left:14ch;text-indent:-2ch">k++;</code></div>
+<div class="code-row" data-no="11" id="lib10-line-11"><span class="num">11</span><code style="padding-left:10ch;text-indent:-2ch">}</code></div>
+<div class="code-row" data-no="12" id="lib10-line-12"><span class="num">12</span><code style="padding-left:10ch;text-indent:-2ch">i += k;</code></div>
+<div class="code-row" data-no="13" id="lib10-line-13"><span class="num">13</span><code style="padding-left:10ch;text-indent:-2ch">j -= k;</code></div>
+<div class="code-row" data-no="14" id="lib10-line-14"><span class="num">14</span><code style="padding-left:6ch;text-indent:-2ch">}</code></div>
+<div class="code-row" data-no="15" id="lib10-line-15"><span class="num">15</span><code style="padding-left:6ch;text-indent:-2ch"><span class="kw">return</span> res;</code></div>
+<div class="code-row" data-no="16" id="lib10-line-16"><span class="num">16</span><code style="padding-left:2ch;text-indent:-2ch">}</code></div>
+<div class="code-row" data-no="17" id="lib10-line-17"><span class="num">17</span><code style="padding-left:2ch;text-indent:-2ch">vector&lt;<span class="kw">int</span>&gt; z_algorithm(<span class="kw">const</span> string&amp; s) {</code></div>
+<div class="code-row" data-no="18" id="lib10-line-18"><span class="num">18</span><code style="padding-left:6ch;text-indent:-2ch"><span class="kw">int</span> n = s.size(), i = <span class="literal">1</span>, j = <span class="literal">0</span>, k;</code></div>
+<div class="code-row" data-no="19" id="lib10-line-19"><span class="num">19</span><code style="padding-left:6ch;text-indent:-2ch">vector&lt;<span class="kw">int</span>&gt; res(n);</code></div>
+<div class="code-row" data-no="20" id="lib10-line-20"><span class="num">20</span><code style="padding-left:6ch;text-indent:-2ch"><span class="kw">while</span> (i &lt; n) {</code></div>
+<div class="code-row" data-no="21" id="lib10-line-21"><span class="num">21</span><code style="padding-left:10ch;text-indent:-2ch"><span class="kw">while</span> (i + j &lt; n &amp;&amp; s[i + j] == s[j]) j++;</code></div>
+<div class="code-row" data-no="22" id="lib10-line-22"><span class="num">22</span><code style="padding-left:10ch;text-indent:-2ch">res[i] = j;</code></div>
+<div class="code-row" data-no="23" id="lib10-line-23"><span class="num">23</span><code style="padding-left:10ch;text-indent:-2ch"><span class="kw">for</span> (k = <span class="literal">1</span>; i + k &lt; n &amp;&amp; k + res[k] &lt; j; k++) res[i + k] = res[k];</code></div>
+<div class="code-row" data-no="24" id="lib10-line-24"><span class="num">24</span><code style="padding-left:10ch;text-indent:-2ch">i += k;</code></div>
+<div class="code-row" data-no="25" id="lib10-line-25"><span class="num">25</span><code style="padding-left:10ch;text-indent:-2ch">j -= min(j, k);</code></div>
+<div class="code-row" data-no="26" id="lib10-line-26"><span class="num">26</span><code style="padding-left:6ch;text-indent:-2ch">}</code></div>
+<div class="code-row" data-no="27" id="lib10-line-27"><span class="num">27</span><code style="padding-left:6ch;text-indent:-2ch"><span class="kw">if</span> (n) res[<span class="literal">0</span>] = n;</code></div>
+<div class="code-row" data-no="28" id="lib10-line-28"><span class="num">28</span><code style="padding-left:6ch;text-indent:-2ch"><span class="kw">return</span> res;</code></div>
+<div class="code-row" data-no="29" id="lib10-line-29"><span class="num">29</span><code style="padding-left:2ch;text-indent:-2ch">}</code></div>
+<div class="note-start"><h2>説明</h2></div>
+<section class="note"><div class="target"><a class="ref" href="#lib10-line-1">1</a><code>vector&lt;<span class="kw">int</span>&gt; manacher(<span class="kw">const</span> string&amp; s) {</code></div><div class="description"><p class="meta expl">各位置を中心とする最長の奇数長回文の半径（中心を含む）</p><p class="meta text">s = ababa -&gt; {1, 2, 3, 2, 1}</p><p class="meta text">偶数長回文は文字間にダミー文字を挿入して求める</p><p class="meta comp">計算量 O(N)</p></div></section>
+<section class="note"><div class="target"><a class="ref" href="#lib10-line-17">17</a><code>vector&lt;<span class="kw">int</span>&gt; z_algorithm(<span class="kw">const</span> string&amp; s) {</code></div><div class="description"><p class="meta expl">各位置から始まる接尾辞と文字列全体の最長共通接頭辞長</p><p class="meta text">s = ababa -&gt; {5, 0, 3, 0, 1}</p><p class="meta text">res[0] = N（空文字列なら空配列）</p><p class="meta comp">計算量 O(N)</p></div></section>
+</section></div>
+<main id="screen"><div class="screen-layout"><article class="screen-code"></article>
+<aside class="screen-notes" aria-label="説明"></aside></div></main>
+<div id="print-pages" aria-hidden="true"></div><script>
+(() => {
+const screen=document.querySelector('#screen');
+const pages=document.querySelector('#print-pages');
+const source=document.querySelector('#source');
+const groups=Array.from(source.querySelectorAll(':scope > .library-source'));
+if(!groups.length) groups.push(source);
+const blocks=[];
+screen.replaceChildren();
+groups.forEach((group,index)=>{
+if(index){
+const spacer=document.createElement('div');spacer.className='library-separator';
+blocks.push(spacer);
+}
+const layout=document.createElement('section');layout.className='screen-layout';
+layout.innerHTML='<article class="screen-code"></article><aside class="screen-notes" aria-label="説明"></aside>';
+const code=layout.querySelector('.screen-code'),notes=layout.querySelector('.screen-notes');
+for(const block of group.children){
+blocks.push(block);
+const copy=block.cloneNode(true);
+(block.classList.contains('note')||block.classList.contains('note-start')?notes:code).appendChild(copy);
+}
+screen.appendChild(layout);
+});
+function buildPrint(){
+pages.replaceChildren();
+let sheet,colIndex=0,pageNumber=0;
+function addPage(){
+sheet=document.createElement('main');sheet.className='sheet';
+sheet.innerHTML='<div class="cols"><div class="col"></div><div class="col"></div><div class="col"></div></div><footer class="footer"></footer>';
+sheet.querySelector('.footer').textContent=String(++pageNumber);pages.appendChild(sheet);colIndex=0;
+}
+function currentColumn(){return sheet.querySelectorAll('.col')[colIndex]}
+function nextColumn(){if(colIndex<2)colIndex++;else addPage()}
+addPage();
+for(const block of blocks){
+let col=currentColumn(),copy=block.cloneNode(true);col.appendChild(copy);
+if(copy.getBoundingClientRect().bottom>col.getBoundingClientRect().bottom+.5){
+col.removeChild(copy);nextColumn();col=currentColumn();col.appendChild(copy);
+if(copy.getBoundingClientRect().bottom>col.getBoundingClientRect().bottom+.5)
+console.warn('Printable item exceeds one column');
+}
+}
+}
+if(document.fonts)document.fonts.ready.then(buildPrint);else buildPrint();
+window.addEventListener('beforeprint',buildPrint);
+})();
+</script></body></html>
