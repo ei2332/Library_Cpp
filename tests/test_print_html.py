@@ -88,6 +88,37 @@ class HtmlTests(unittest.TestCase):
         self.assertIn('補足', h.stdout)
         self.assertNotIn('#include', h.stdout)
 
+    def test_all_html_preserves_sections_and_unique_line_links(self):
+        sys.path.insert(0, str(PARSER.parent))
+        from print_html import render_all
+        first = cli(SOURCE, "--html")
+        second = cli(SOURCE.replace("@name Example", "@name Second"), "--html")
+        self.assertEqual(first.returncode, 0, first.stderr)
+        self.assertEqual(second.returncode, 0, second.stderr)
+        html = render_all([first.stdout, second.stdout])
+        self.assertIn("<title>Library_Cpp — All</title>", html)
+        self.assertEqual(html.count('class="library-source"'), 2)
+        self.assertIn('id="lib1-line-2"', html)
+        self.assertIn('href="#lib1-line-2"', html)
+        self.assertIn('id="lib2-line-2"', html)
+        self.assertIn('href="#lib2-line-2"', html)
+        self.assertNotIn('id="line-2"', html)
+
+    def test_prime_spf_boost_is_optional_and_shaded(self):
+        source = (PARSER.parents[1] / "src" / "prime.cpp").read_text(encoding="utf-8")
+        self.assertNotIn("PRIME_SPF_BOOST", source)
+        basic = cli(source, "-s", "include")
+        boosted = cli(source, "-s", "include", "-s", "spf_boost")
+        html = cli(source, "--html")
+        for result in (basic, boosted, html):
+            self.assertEqual(result.returncode, 0, result.stderr)
+        self.assertNotIn("SPF _spf", basic.stdout)
+        self.assertIn("SPF _spf", boosted.stdout)
+        self.assertIn("_spf.fact(n, r);", boosted.stdout)
+        self.assertNotIn("_spf.fact(n, r);", basic.stdout)
+        self.assertIn("code-row shaded", html.stdout)
+        self.assertIn("_spf", html.stdout)
+
     def test_cpp_legacy_outputs(self):
         r = cli(SOURCE, "-s", "include")
         self.assertEqual(r.returncode, 0, r.stderr)
