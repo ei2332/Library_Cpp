@@ -231,7 +231,7 @@ def render_all(pages):
         combined.append('<section class="library-source">\\n' + fragment
                         + '\\n</section>')
     result = marker.sub(
-        lambda m: m.group(1) + '\\n'.join(combined) + m.group(3),
+        lambda m: m.group(1) + '\n'.join(combined) + m.group(3),
         pages[0],
         count=1,
     )
