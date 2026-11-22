@@ -29,7 +29,7 @@ python -m unittest discover -s tests -p 'test_print_html.py'
 
 GitHub Actionsの `build_html` ジョブが `verify` ジョブと並列に実行されます。
 `scripts/build_site.py` は `src/` の全ライブラリを既存の `libparser.py` で解析し、
-`dist/index.html` と `dist/lib/*.html` を生成します。
+`dist/index.html`、`dist/all.html` と `dist/lib/*.html` を生成します。
 成果物は Actions Artifact `library-print-html` として保存されます。
 通常の `verify` ジョブの成功に依存せず、HTML生成の成否も独立にCIに反映されます。
 
@@ -50,3 +50,20 @@ python scripts/build_site.py --output dist
 - 説明・計算量・補足は、対応する**次のコード行**を引用してコード末尾にまとめます。画面では右側に表示します。
 - ソースに含まれる `@shade` 指定のコードは、画面・印刷ともに背景色で区別します。
 - コード抽出やCIのHTML生成・公開処理には変更を加えません。
+
+## 全ライブラリ結合ページ
+
+`all.html` は各ライブラリの `--html` 出力を結合した、単独で開けるHTMLです。
+`index.html` から移動できます。各ライブラリの見出し・コード・説明を連続表示し、
+画面ではライブラリごとの左右2カラム、印刷では全体をA4横3段組に配置します。
+印刷時のページ番号は `all.html` 全体で通し番号になります。
+コード行のリンク先は結合時に名前空間を付与し、ライブラリ間の行番号衝突を避けます。
+個別の `lib/*.html` も従来どおり生成します。GitHub Actionsでの生成結果は
+`gh-pages` ブランチへ反映されます。
+
+## Primeのオプションスコープ
+
+`src/prime.cpp` のSPF高速化は `//// ! spf_boost` / `//// end` で囲み、
+`//// @shade spf_boost` によってHTML上で背景色を付けています。
+通常の出力には含まず、`-s spf_boost` を指定したときだけ展開します。
+従来の `PRIME_SPF_BOOST` マクロは不要です。
