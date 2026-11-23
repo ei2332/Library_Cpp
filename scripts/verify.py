@@ -76,6 +76,14 @@ def verify_file(path: Path) -> None:
             inputs = list(tests.rglob("*.in"))
             if not inputs or any(not p.with_suffix(".out").is_file() for p in inputs):
                 raise ValueError(f"@check #{index}: no complete test cases downloaded")
+            # This Dinic harness checks the unique maximum matching size.
+            # The official output also contains a non-unique matching.
+            if relative == "src/Dinic.cpp" and url == "https://judge.yosupo.jp/problem/bipartitematching":
+                for input_file in inputs:
+                    output_file = input_file.with_suffix(".out")
+                    first_line = output_file.read_text().splitlines()[0]
+                    output_file.write_text(first_line + "\n")
+
             subprocess.run(
                 ["oj", "test", "-d", str(tests), "-c", str(executable)],
                 check=True,
