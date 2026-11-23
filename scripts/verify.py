@@ -82,7 +82,7 @@ def verify_file(path: Path) -> None:
                 for input_file in inputs:
                     output_file = input_file.with_suffix(".out")
                     first_line = output_file.read_text().splitlines()[0]
-                    output_file.write_text(first_line + "\\n")
+                    output_file.write_text(first_line + "\n")
 
             subprocess.run(
                 ["oj", "test", "-d", str(tests), "-c", str(executable)],
