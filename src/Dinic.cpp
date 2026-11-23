@@ -1,6 +1,7 @@
 //// @url https://github.com/ei2332/Library_Cpp/blob/main/src/Dinic.cpp
 //// @name Dinic
 //// @expl Dinic法による最大流
+//// @check https://judge.yosupo.jp/problem/bipartitematching include check_matching
 //// ! include
 #include <bits/stdc++.h>
 using namespace std;
@@ -15,7 +16,6 @@ struct Dinic {
     Dinic(int n) : e(n), l(n), it(n) {}
 
     //// expl uからvへの容量capの有向辺を追加する。自己ループは追加せずfalseを返す
-    //// comp O(1) 償却
     bool add_edge(int u, int v, int cap) {
         if (u == v) return 0;
         int a = e[u].size(), b = e[v].size();
@@ -65,3 +65,22 @@ struct Dinic {
         return ans;
     }
 };
+
+//// ! check_matching
+signed main() {
+    ios::sync_with_stdio(false);
+    cin.tie(nullptr);
+    int l, r, m;
+    cin >> l >> r >> m;
+    int s = l + r, t = s + 1;
+    Dinic flow(t + 1);
+    for (int i = 0; i < l; i++) flow.add_edge(s, i, 1);
+    for (int i = 0; i < r; i++) flow.add_edge(l + i, t, 1);
+    while (m--) {
+        int a, b;
+        cin >> a >> b;
+        flow.add_edge(a, l + b, 1);
+    }
+    cout << flow.max_flow(s, t) << '\n';
+}
+//// end
