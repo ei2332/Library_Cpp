@@ -2,6 +2,7 @@
 //// @name Dinic
 //// @expl Dinic法による最大流
 //// @check https://judge.yosupo.jp/problem/bipartitematching include check_matching
+//// @checked https://atcoder.jp/contests/practice2/tasks/practice2_d include check_atcoder
 //// ! include
 #include <bits/stdc++.h>
 using namespace std;
@@ -82,5 +83,58 @@ signed main() {
         flow.add_edge(a, l + b, 1);
     }
     cout << flow.max_flow(s, t) << '\n';
+}
+//// end
+
+//// ! check_atcoder
+signed main() {
+    ios::sync_with_stdio(false);
+    cin.tie(nullptr);
+
+    int n, m;
+    cin >> n >> m;
+    vector<string> grid(n);
+    for (auto& row : grid) cin >> row;
+
+    int s = n * m, t = s + 1;
+    Dinic dinic(t + 1);
+    const int dr[] = {-1, 1, 0, 0};
+    const int dc[] = {0, 0, -1, 1};
+
+    for (int r = 0; r < n; ++r) {
+        for (int c = 0; c < m; ++c) {
+            if (grid[r][c] == '#') continue;
+            int u = r * m + c;
+            if ((r + c) % 2 == 1) {
+                dinic.add_edge(u, t, 1);
+                continue;
+            }
+            dinic.add_edge(s, u, 1);
+            for (int k = 0; k < 4; ++k) {
+                int nr = r + dr[k], nc = c + dc[k];
+                if (nr < 0 || nr >= n || nc < 0 || nc >= m) continue;
+                if (grid[nr][nc] == '.') dinic.add_edge(u, nr * m + nc, 1);
+            }
+        }
+    }
+
+    cout << dinic.max_flow(s, t) << '\n';
+    for (int r = 0; r < n; ++r) {
+        for (int c = 0; c < m; ++c) {
+            if ((r + c) % 2 == 1) continue;
+            for (const auto& edge : dinic.e[r * m + c]) {
+                if (edge.to >= s || edge.cap != 0) continue;
+                int nr = edge.to / m, nc = edge.to % m;
+                if (r == nr) {
+                    grid[r][min(c, nc)] = '>';
+                    grid[r][max(c, nc)] = '<';
+                } else {
+                    grid[min(r, nr)][c] = 'v';
+                    grid[max(r, nr)][c] = '^';
+                }
+            }
+        }
+    }
+    for (const auto& row : grid) cout << row << '\n';
 }
 //// end
